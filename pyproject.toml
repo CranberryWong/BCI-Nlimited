@@ -1,0 +1,21 @@
+[project]
+name = "bci-dataflow-server"
+version = "0.1.0"
+description = "Local BCI data-flow server with OSC, MIDI, and a Vue control console."
+requires-python = ">=3.10"
+dependencies = [
+  "Flask>=3.0",
+  "python-osc>=1.9",
+  "watchdog>=4.0",
+  "numpy>=1.26,<2",
+  "pyxdf>=1.16,<1.17",
+  "joblib>=1.3",
+  "mido>=1.3",
+  "python-rtmidi>=1.5",
+]
+
+[project.scripts]
+bci-server = "server.app:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
