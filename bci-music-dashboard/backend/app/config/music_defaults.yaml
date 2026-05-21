@@ -1,0 +1,210 @@
+global:
+  bpm:
+    default: 96
+    min: 30
+    max: 220
+    editable: true
+  root_note:
+    default: C
+    options: [C, C#, D, D#, E, F, F#, G, G#, A, A#, B]
+    editable: true
+  scale:
+    default: auto
+    options: [auto, major, minor, pentatonic, chromatic, dorian, lydian, phrygian]
+    editable: true
+  quantization:
+    default: 1/8
+    options: ["1/1", "1/2", "1/4", "1/8", "1/16", "free"]
+    editable: true
+  swing: {default: 0.0, min: 0.0, max: 0.7, editable: true}
+  humanize: {default: 0.12, min: 0.0, max: 1.0, editable: true}
+  master_velocity: {default: 0.8, min: 0.0, max: 1.0, editable: true}
+  master_density: {default: 0.6, min: 0.0, max: 1.0, editable: true}
+  output_mode:
+    default: osc
+    options: [osc, midi, both, mock]
+    editable: true
+emotion_profiles:
+  joy:
+    label_zh: 高兴
+    scale: major
+    bpm_range: [100, 140]
+    pitch_range: [60, 88]
+    velocity_range: [60, 115]
+    density_range: [0.55, 0.95]
+    delay_ms_range: [60, 250]
+    chord_quality: major
+    brightness: 0.9
+    tension: 0.15
+    editable: true
+  calm:
+    label_zh: 平静
+    scale: pentatonic
+    bpm_range: [55, 90]
+    pitch_range: [48, 76]
+    velocity_range: [25, 70]
+    density_range: [0.10, 0.45]
+    delay_ms_range: [300, 1000]
+    chord_quality: open_fifth
+    brightness: 0.65
+    tension: 0.05
+    editable: true
+  neutral:
+    label_zh: 中性
+    scale: major
+    bpm_range: [75, 110]
+    pitch_range: [52, 80]
+    velocity_range: [40, 85]
+    density_range: [0.30, 0.65]
+    delay_ms_range: [150, 600]
+    chord_quality: triad
+    brightness: 0.5
+    tension: 0.1
+    editable: true
+  tense:
+    label_zh: 紧张
+    scale: chromatic
+    bpm_range: [110, 165]
+    pitch_range: [55, 92]
+    velocity_range: [70, 125]
+    density_range: [0.70, 1.0]
+    delay_ms_range: [30, 200]
+    chord_quality: diminished
+    brightness: 0.45
+    tension: 0.85
+    editable: true
+  sad:
+    label_zh: 悲伤
+    scale: minor
+    bpm_range: [40, 75]
+    pitch_range: [36, 68]
+    velocity_range: [20, 65]
+    density_range: [0.08, 0.38]
+    delay_ms_range: [500, 1600]
+    chord_quality: minor
+    brightness: 0.25
+    tension: 0.35
+    editable: true
+default_tracks:
+  - id: piano_melody_01
+    name: Piano Melody
+    enabled: true
+    compute_enabled: true
+    role: melody
+    instrument: piano
+    output_type: osc
+    target_ip: 127.0.0.1
+    target_port: 57120
+    midi_channel: 1
+    midi_program: 0
+    root_note: auto
+    scale: auto
+    pitch_range: [60, 84]
+    velocity_range: [35, 105]
+    bpm: auto
+    density: 0.6
+    delay_ms: 125
+    note_length_ms: 300
+    humanize: 0.12
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, mapping]
+    mapping: {valence_to_pitch: 0.85, arousal_to_velocity: 0.75, arousal_to_density: 0.85, probability_to_randomness: -0.6}
+  - id: chord_pad_01
+    name: Chord Pad
+    enabled: true
+    compute_enabled: true
+    role: pad
+    instrument: pad
+    output_type: osc
+    target_ip: 127.0.0.1
+    target_port: 57120
+    midi_channel: 2
+    midi_program: 88
+    root_note: auto
+    scale: auto
+    pitch_range: [48, 72]
+    velocity_range: [20, 80]
+    bpm: auto
+    density: 0.25
+    delay_ms: 500
+    note_length_ms: 1800
+    humanize: 0.2
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, mapping]
+    mapping: {valence_to_pitch: 0.35, arousal_to_velocity: 0.3, arousal_to_density: 0.2, probability_to_randomness: -0.3}
+  - id: bass_01
+    name: Bass
+    enabled: true
+    compute_enabled: true
+    role: bass
+    instrument: bass
+    output_type: osc
+    target_ip: 127.0.0.1
+    target_port: 57120
+    midi_channel: 3
+    midi_program: 32
+    root_note: auto
+    scale: auto
+    pitch_range: [36, 55]
+    velocity_range: [35, 100]
+    bpm: auto
+    density: 0.35
+    delay_ms: 0
+    note_length_ms: 600
+    humanize: 0.08
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, mapping]
+    mapping: {valence_to_pitch: 0.25, arousal_to_velocity: 0.55, arousal_to_density: 0.7, probability_to_randomness: -0.4}
+  - id: drum_01
+    name: Drum
+    enabled: true
+    compute_enabled: true
+    role: drum
+    instrument: drum
+    output_type: osc
+    target_ip: 127.0.0.1
+    target_port: 57120
+    midi_channel: 10
+    midi_program: null
+    root_note: C
+    scale: chromatic
+    pitch_range: [35, 51]
+    velocity_range: [40, 120]
+    bpm: auto
+    density: 0.55
+    delay_ms: 0
+    note_length_ms: 120
+    humanize: 0.1
+    drum_notes: {kick: 36, snare: 38, closed_hat: 42, open_hat: 46, crash: 49, ride: 51}
+    editable_params: [enabled, compute_enabled, output_type, target_ip, target_port, midi_channel, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, drum_notes, mapping]
+    mapping: {valence_to_pitch: 0.0, arousal_to_velocity: 0.9, arousal_to_density: 1.0, probability_to_randomness: -0.2}
+  - id: cymbal_01
+    name: Cymbal / Hi-hat
+    enabled: true
+    compute_enabled: true
+    role: cymbal
+    instrument: cymbal
+    output_type: osc
+    target_ip: 127.0.0.1
+    target_port: 57120
+    midi_channel: 10
+    midi_program: null
+    root_note: C
+    scale: chromatic
+    pitch_range: [42, 57]
+    velocity_range: [30, 115]
+    bpm: auto
+    density: 0.45
+    delay_ms: 0
+    note_length_ms: 80
+    humanize: 0.12
+    trigger_on_arousal_rise: true
+    arousal_rise_threshold: 0.18
+    editable_params: [enabled, compute_enabled, output_type, target_ip, target_port, midi_channel, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, trigger_on_arousal_rise, arousal_rise_threshold, mapping]
+    mapping: {valence_to_pitch: 0.0, arousal_to_velocity: 0.85, arousal_to_density: 0.95, probability_to_randomness: -0.1}
+music_parameter_schema:
+  pitch_range: {type: int_range, min: 0, max: 127, editable: true}
+  velocity_range: {type: int_range, min: 0, max: 127, editable: true}
+  bpm: {type: int_or_auto, min: 30, max: 220, editable: true}
+  density: {type: float, min: 0.0, max: 1.0, editable: true}
+  delay_ms: {type: int, min: 0, max: 5000, editable: true}
+  note_length_ms: {type: int, min: 20, max: 10000, editable: true}
+  humanize: {type: float, min: 0.0, max: 1.0, editable: true}
+  mapping_weight: {type: float, min: -1.0, max: 1.0, editable: true}

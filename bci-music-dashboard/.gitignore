@@ -1,0 +1,16 @@
+.env
+.DS_Store
+.venv/
+backend/.venv/
+backend/__pycache__/
+backend/app/**/__pycache__/
+backend/.pytest_cache/
+frontend/node_modules/
+frontend/dist/
+models/*.pkl
+!models/.gitkeep
+backend/data/sessions/*
+!backend/data/sessions/.gitkeep
+backend/data/presets/*
+!backend/data/presets/.gitkeep
+*.log

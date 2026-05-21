@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - .env
+    ports:
+      - "8001:8001"
+      - "8000:8000/udp"
+    volumes:
+      - ./models:/app/models:ro
+      - ./backend/data:/app/backend/data
+      - ${XDF_ROOT_DIR:-./xdf-records}:/xdf-records
+    environment:
+      XDF_ROOT_DIR: /xdf-records
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
