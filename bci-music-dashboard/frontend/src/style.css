@@ -2,7 +2,7 @@
   color-scheme: light;
   font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   color: #18212b;
-  background: #eef3f5;
+  background: #fff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -14,6 +14,7 @@
 
 body {
   margin: 0;
+  background: #fff;
 }
 
 #app {
@@ -21,8 +22,8 @@ body {
 }
 
 .surface {
-  border: 1px solid #d8e1e8;
-  border-radius: 8px;
+  border: 1px solid #000;
+  border-radius: 0;
   background: #fff;
 }
 
@@ -31,4 +32,26 @@ body {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.n-button,
+.n-card,
+.n-data-table,
+.n-data-table-wrapper,
+.n-drawer,
+.n-drawer-content,
+.n-input,
+.n-input-wrapper,
+.n-input-number,
+.n-select,
+.n-base-selection,
+.n-tag {
+  border-radius: 0 !important;
+}
+
+.n-button--primary-type,
+.n-button--primary-type:hover,
+.n-button--primary-type:focus {
+  background-color: #000 !important;
+  border-color: #000 !important;
 }

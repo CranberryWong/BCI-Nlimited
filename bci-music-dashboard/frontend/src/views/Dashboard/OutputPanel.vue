@@ -4,7 +4,7 @@
       <h3>Outputs</h3>
       <n-tag :type="midi.mode === 'mock' ? 'warning' : 'success'">MIDI {{ midi.mode }}</n-tag>
     </header>
-    <p>{{ midi.detail || midi.ports.join(', ') || 'OSC tracks send to their configured targets.' }}</p>
+    <p>{{ outputSummary }}</p>
     <div class="toolbar-gap">
       <n-select v-model:value="selected" :options="options" placeholder="Select track" />
       <n-button :disabled="!selected" type="primary" @click="$emit('test', selected)">Test Output</n-button>
@@ -21,6 +21,14 @@ const props = defineProps<{ tracks: TrackConfig[]; midi: { mode: string; ports: 
 defineEmits(['test']);
 const selected = ref<string | null>(null);
 const options = computed(() => props.tracks.map((track) => ({ label: track.name, value: track.id })));
+const outputSummary = computed(() => {
+  if (props.midi.mode === 'rtmidi') {
+    return props.midi.ports.length
+      ? `已检测到 ${props.midi.ports.length} 个 MIDI 输出端口。`
+      : 'MIDI 后端可用，当前未列出输出端口。';
+  }
+  return props.midi.detail || 'OSC 音轨会发送到各自配置的目标地址。';
+});
 watch(options, (items) => {
   if (!selected.value && items[0]) selected.value = items[0].value;
 }, { immediate: true });
@@ -28,6 +36,7 @@ watch(options, (items) => {
 
 <style scoped>
 .panel {
+  height: 100%;
   padding: 18px;
 }
 header {

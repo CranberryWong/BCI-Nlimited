@@ -153,17 +153,18 @@ Recording APIs:
 - `POST /api/sessions/start`
 - `POST /api/sessions/stop`
 - `GET /api/sessions`
-- `GET /api/sessions/{id}/download?format=mid|jsonl|csv`
+- `GET /api/sessions/{id}/download?format=mid|csv|emotion-jsonl|music-jsonl|config`
 
 Each stopped session stores:
 
 - emotion time series CSV;
-- music and OSC-style event timeline JSONL;
+- emotion timeline JSONL;
+- music event log JSONL;
 - generated MIDI file;
 - `music_config_snapshot.yaml`.
 
 Those artifacts preserve the input emotion stream, event decisions, exported MIDI,
-OSC timeline, and the exact music configuration used for an experiment.
+and the exact music configuration used for an experiment.
 
 ## Presets And API
 

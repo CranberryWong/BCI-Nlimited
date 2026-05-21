@@ -68,7 +68,13 @@ class SessionRecorder:
         return sessions
 
     def artifact(self, session_id: str, file_format: str) -> Path:
-        filenames = {"mid": "music.mid", "jsonl": "timeline.jsonl", "csv": "emotion.csv"}
+        filenames = {
+            "mid": "music.mid",
+            "csv": "emotion.csv",
+            "emotion-jsonl": "emotion_timeline.jsonl",
+            "music-jsonl": "music_event_log.jsonl",
+            "config": "music_config_snapshot.yaml",
+        }
         if file_format not in filenames:
             raise KeyError(file_format)
         path = self.root / session_id / filenames[file_format]
@@ -78,11 +84,12 @@ class SessionRecorder:
 
     def _flush_jsonl(self) -> None:
         assert self.active_dir
-        with (self.active_dir / "timeline.jsonl").open("w", encoding="utf-8") as handle:
+        with (self.active_dir / "emotion_timeline.jsonl").open("w", encoding="utf-8") as handle:
             for emotion in self.emotions:
-                handle.write(json.dumps({"kind": "emotion", **emotion.model_dump()}, ensure_ascii=False) + "\n")
+                handle.write(json.dumps(emotion.model_dump(), ensure_ascii=False) + "\n")
+        with (self.active_dir / "music_event_log.jsonl").open("w", encoding="utf-8") as handle:
             for event in self.events:
-                handle.write(json.dumps({"kind": "music_event", **event.model_dump()}, ensure_ascii=False) + "\n")
+                handle.write(json.dumps(event.model_dump(), ensure_ascii=False) + "\n")
 
     def _flush_csv(self) -> None:
         assert self.active_dir

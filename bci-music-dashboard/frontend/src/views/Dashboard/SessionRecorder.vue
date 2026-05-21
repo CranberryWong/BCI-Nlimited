@@ -9,7 +9,10 @@
       <n-button :disabled="!active" @click="stop">Stop Recording</n-button>
       <n-button @click="load">Refresh</n-button>
     </div>
-    <n-data-table :columns="columns" :data="sessions" size="small" />
+    <p>录制期间会保存情绪时间序列、Music Events、MIDI 文件和音乐配置快照。</p>
+    <div class="session-table">
+      <n-data-table :columns="columns" :data="sessions" size="small" />
+    </div>
   </section>
 </template>
 
@@ -34,14 +37,24 @@ async function load() {
 }
 const columns: DataTableColumns<Session> = [
   { title: 'Session', key: 'id' },
-  { title: 'Files', key: 'files', render: (row) => row.files.join(', ') },
   {
     title: 'Export',
     key: 'actions',
-    render: (row) => h('div', { class: 'toolbar-gap' }, ['mid', 'jsonl', 'csv'].map((format) =>
-      h(NButton, { size: 'small', tag: 'a', href: `/api/sessions/${row.id}/download?format=${format}` }, { default: () => format.toUpperCase() }),
-    )),
+    render: (row) => h('div', { class: 'file-actions' }, exports
+      .filter((item) => row.files.includes(item.file))
+      .map((item) => h(NButton, {
+        size: 'small',
+        tag: 'a',
+        href: `/api/sessions/${row.id}/download?format=${item.format}`,
+      }, { default: () => item.file }))),
   },
+];
+const exports = [
+  { file: 'music.mid', format: 'mid' },
+  { file: 'emotion.csv', format: 'csv' },
+  { file: 'emotion_timeline.jsonl', format: 'emotion-jsonl' },
+  { file: 'music_event_log.jsonl', format: 'music-jsonl' },
+  { file: 'music_config_snapshot.yaml', format: 'config' },
 ];
 onMounted(load);
 </script>
@@ -49,6 +62,7 @@ onMounted(load);
 <style scoped>
 .panel {
   display: grid;
+  height: 100%;
   gap: 12px;
   padding: 18px;
 }
@@ -58,5 +72,19 @@ header {
 }
 h3 {
   margin: 0;
+}
+p {
+  margin: 0;
+  font-size: 13px;
+}
+:deep(.file-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.session-table {
+  max-height: 240px;
+  overflow: auto;
+  border: 1px solid #000;
 }
 </style>

@@ -21,9 +21,9 @@
           <template #unchecked>Hold</template>
         </n-switch>
         <div class="actions">
-          <n-button quaternary circle title="Edit track" @click="$emit('edit', track)"><template #icon><n-icon><Pencil /></n-icon></template></n-button>
-          <n-button quaternary circle title="Duplicate track" @click="$emit('duplicate', track.id)"><template #icon><n-icon><Copy /></n-icon></template></n-button>
-          <n-button quaternary circle title="Delete track" @click="$emit('remove', track.id)"><template #icon><n-icon><Trash2 /></n-icon></template></n-button>
+          <n-button quaternary title="Edit track" @click="$emit('edit', track)"><template #icon><n-icon><Pencil /></n-icon></template></n-button>
+          <n-button quaternary title="Duplicate track" @click="$emit('duplicate', track.id)"><template #icon><n-icon><Copy /></n-icon></template></n-button>
+          <n-button quaternary title="Delete track" @click="$emit('remove', track.id)"><template #icon><n-icon><Trash2 /></n-icon></template></n-button>
         </div>
       </article>
     </div>
@@ -49,6 +49,7 @@ const addOptions = [
 
 <style scoped>
 .track-list {
+  height: 100%;
   padding: 18px;
 }
 
@@ -75,7 +76,7 @@ h3 {
 }
 
 .track-row {
-  border-top: 1px solid #e4ebf0;
+  border-top: 1px solid #000;
   padding-top: 10px;
 }
 

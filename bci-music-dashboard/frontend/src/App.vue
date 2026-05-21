@@ -12,11 +12,14 @@ import Dashboard from './views/Dashboard/index.vue';
 
 const themeOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: '#1769aa',
-    primaryColorHover: '#2780c2',
-    successColor: '#2d8a5b',
-    warningColor: '#bf6a00',
-    borderRadius: '6px',
+    primaryColor: '#000000',
+    primaryColorHover: '#000000',
+    primaryColorPressed: '#000000',
+    primaryColorSuppl: '#000000',
+    successColor: '#000000',
+    successColorHover: '#000000',
+    warningColor: '#000000',
+    borderRadius: '0px',
   },
 };
 </script>

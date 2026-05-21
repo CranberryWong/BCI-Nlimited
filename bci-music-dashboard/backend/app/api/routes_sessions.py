@@ -27,8 +27,14 @@ def download(session_id: str, format: str, request: Request):
     try:
         path = request.app.state.recorder.artifact(session_id, format)
     except KeyError as exc:
-        raise HTTPException(status_code=400, detail="format must be mid, jsonl, or csv") from exc
+        raise HTTPException(status_code=400, detail="format must be mid, csv, emotion-jsonl, music-jsonl, or config") from exc
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="session artifact not found") from exc
-    media_types = {"mid": "audio/midi", "jsonl": "application/x-ndjson", "csv": "text/csv"}
+    media_types = {
+        "mid": "audio/midi",
+        "csv": "text/csv",
+        "emotion-jsonl": "application/x-ndjson",
+        "music-jsonl": "application/x-ndjson",
+        "config": "application/x-yaml",
+    }
     return FileResponse(path, media_type=media_types[format], filename=path.name)

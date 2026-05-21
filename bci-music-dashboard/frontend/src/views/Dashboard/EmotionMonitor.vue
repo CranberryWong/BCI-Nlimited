@@ -11,7 +11,7 @@
         <n-descriptions-item label="输入 OSC">{{ status.osc_input ?? '--' }}</n-descriptions-item>
         <n-descriptions-item label="置信度">{{ confidence }}</n-descriptions-item>
       </n-descriptions>
-      <div class="toolbar-gap">
+      <div class="control-grid">
         <n-button type="primary" @click="$emit('start-simulator')">Start Simulator</n-button>
         <n-button @click="$emit('stop-simulator')">Stop</n-button>
         <n-button :disabled="status.model_available === false" @click="$emit('start-model')">Start Model</n-button>
@@ -111,7 +111,7 @@ h2 {
 }
 
 .emotion {
-  border-radius: 8px;
+  border-radius: 0;
   background: #dff0dd;
   padding: 20px;
   text-align: center;
@@ -126,6 +126,15 @@ h2 {
 
 .chart {
   height: 360px;
+}
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.control-grid :deep(.n-button) {
+  width: 100%;
+  min-height: 36px;
 }
 
 @media (max-width: 900px) {
