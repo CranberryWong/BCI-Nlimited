@@ -1,8 +1,0 @@
-Flask>=3.0
-python-osc>=1.9
-watchdog>=4.0
-numpy>=1.26,<2
-pyxdf>=1.16,<1.17
-joblib>=1.3
-mido>=1.3
-python-rtmidi>=1.5
