@@ -5,9 +5,9 @@ import time
 
 from app.music.midi_output import MidiOutput
 from app.music.osc_output import OscOutput
-from app.music.scales import choose_quantized, resolve_scale, root_pc, scale_notes
+from app.music.scales import choose_quantized, resolve_scale, root_pc, scale_notes, enumerate_scale_sequence
 from app.music.schemas import ActiveMusicConfig, EmotionState, MusicEvent, TrackConfig
-
+from collections import defaultdict
 
 class MusicEngine:
     def __init__(self, config: ActiveMusicConfig, midi: MidiOutput, osc: OscOutput) -> None:
@@ -16,6 +16,7 @@ class MusicEngine:
         self.osc = osc
         self.last_arousal = 0.0
         self.last_label = "neutral"
+        self.sequence_index: dict[str, int] = defaultdict(int)
 
     def update_config(self, config: ActiveMusicConfig) -> None:
         self.config = config
@@ -30,7 +31,13 @@ class MusicEngine:
             if track.role not in {"pad", "chord"} and random.random() > density:
                 continue
             if track.role == "melody":
-                events.extend(self._melody(track, emotion))
+                # 新增模式切换：若 play_mode 为 "sequence"，使用预定义序列
+                if track.play_mode == "sequence":
+                    events.extend(self._melody_sequence(track))
+                    continue
+                else:
+                    events.extend(self._melody(track, emotion))
+         
             elif track.role == "chord":
                 events.extend(self._chord(track, emotion))
             elif track.role == "bass":
@@ -51,6 +58,33 @@ class MusicEngine:
             self._dispatch(track, event)
         return events
 
+    # def generate_fixed_sequence(self, track, root_note="C#", scale="pentatonic", low=61, high=94):
+    #     notes = enumerate_scale_sequence(root_note, scale, low, high)
+
+    def generate_fixed_sequence(
+        self,
+        track: TrackConfig,
+        root_note: str | None = None,
+        scale: str | None = None,
+        low: int | None = None,
+        high: int | None = None,
+        velocity: int | None = None,
+    ) -> list[MusicEvent]:
+        # 采用 track 配置为默认
+        root_note = root_note or track.sequence_root_note
+        scale = scale or track.sequence_scale
+        low = low if low is not None else track.sequence_low
+        high = high if high is not None else track.sequence_high
+        velocity = velocity if velocity is not None else max(track.velocity_range[0], min(track.velocity_range[1], 80))
+
+        # 获取确定性音序
+        notes = enumerate_scale_sequence(root_note, scale, low, high)
+
+        events: list[MusicEvent] = []
+        for pitch in notes:
+            events.extend(self._note(track, pitch, velocity, track.note_length_ms))
+
+        return events
     def test_event(self, track: TrackConfig) -> list[MusicEvent]:
         events = self._note(track, sum(track.pitch_range) // 2, max(64, track.velocity_range[0]), min(360, track.note_length_ms))
         for event in events:
@@ -72,6 +106,23 @@ class MusicEngine:
         velocity = self._velocity(track, emotion)
         return self._note(track, pitch, velocity, track.note_length_ms)
 
+    def _melody_sequence(self, track: TrackConfig) -> list[MusicEvent]:
+        root_note = track.sequence_root_note
+        scale = track.sequence_scale
+        low = track.sequence_low
+        high = track.sequence_high
+        notes = enumerate_scale_sequence(root_note, scale, low, high)
+        if not notes:
+            return []
+
+        # 获取当前索引音
+        idx = self.sequence_index[track.id]
+        pitch = notes[idx % len(notes)]
+        self.sequence_index[track.id] = idx + 1
+
+        velocity = max(track.velocity_range[0], min(track.velocity_range[1], 80))
+        return self._note(track, pitch, velocity, track.note_length_ms)
+    
     def _chord(self, track: TrackConfig, emotion: EmotionState) -> list[MusicEvent]:
         root = self._pitch(track, emotion, self._randomness(track, emotion) / 2)
         qualities = {
@@ -129,8 +180,18 @@ class MusicEngine:
         return max(1, min(127, round((low + (high - low) * position) * self.config.global_settings.master_velocity)))
 
     def _density(self, track: TrackConfig, emotion: EmotionState) -> float:
-        density = track.density + (emotion.arousal_norm - 0.5) * track.mapping.arousal_to_density
-        return max(0.02, min(1.0, density * self.config.global_settings.master_density))
+        base = track.density
+        arousal_gain = (emotion.arousal_norm - 0.5) * track.mapping.arousal_to_density
+        density = (base + arousal_gain) * self.config.global_settings.master_density
+
+        if track.role == "drum":
+            density *= 1.3
+        elif track.role == "cymbal":
+            density *= 1.2
+        elif track.role == "pad":
+            density *= 0.5
+
+        return max(0.12, min(1.0, density))
 
     @staticmethod
     def _randomness(track: TrackConfig, emotion: EmotionState) -> float:
