@@ -83,14 +83,83 @@ XDF 文件的目录。
 
 ## Docker Compose
 
+推荐在目标台式机部署时使用 Docker。容器结构为：
+
+- `frontend`：Vue 生产构建，由 Nginx 提供页面，并代理 `/api` 与 `/ws`。
+- `backend`：FastAPI、OSC 输入、模型推理与音乐引擎。
+- `models`：宿主机只读挂载，镜像重建不会丢失模型。
+- `backend/data`：宿主机持久化挂载，保存 Preset 和 Session。
+- `xdf-records`：宿主机采集目录挂载到容器内 `/xdf-records`。
+
+### 有网络的目标电脑
+
+安装 Docker Desktop 后，把项目源码复制或从 Gitee 克隆到目标电脑，然后：
+
 ```bash
 cd bci-music-dashboard
 cp .env.example .env
 docker compose up --build
 ```
 
-Compose 会暴露前端 `5173`、后端 `8001` 和 UDP 输入 OSC 端口 `8000`。`models` 目录
-以只读方式挂载，`backend/data` 会保存 preset 和 session。
+Windows PowerShell 可直接运行：
+
+```powershell
+cd bci-music-dashboard
+.\scripts\start-docker.ps1
+```
+
+如果真实 XDF 位于 Windows 的 Leaf 目录，在 `.env` 中设置：
+
+```env
+HOST_XDF_ROOT_DIR=C:/Users/SJTU/.leaf/record
+```
+
+Compose 会暴露前端 `5173`、后端 `8001` 和 UDP 输入 OSC 端口 `8000`。访问：
+
+```text
+Dashboard: http://127.0.0.1:5173
+API Docs: http://127.0.0.1:8001/docs
+```
+
+### 离线或网络不稳定的目标电脑
+
+在开发机项目目录执行：
+
+```bash
+./scripts/export-docker-bundle.sh linux/amd64
+```
+
+脚本会生成 `docker-bundle/`，其中包括：
+
+- Linux/AMD64 后端和前端镜像压缩包；
+- `docker-compose.yml` 与 `.env.example`；
+- Windows 启动脚本 `start-windows.ps1`；
+- 模型文件（如果存在）；
+- 当前 Preset 和 Session 数据目录。
+
+将整个 `docker-bundle` 文件夹通过移动硬盘、局域网或网盘传到 Windows 目标电脑。
+安装并启动 Docker Desktop，切换到 Linux containers，然后在 PowerShell 执行：
+
+```powershell
+cd D:\path\to\docker-bundle
+Set-ExecutionPolicy -Scope Process Bypass
+.\start-windows.ps1
+```
+
+脚本会执行 `docker load` 和 `docker compose up -d --no-build`，目标电脑不需要访问
+Python、npm 或镜像仓库。
+
+停止和更新：
+
+```powershell
+docker compose down
+docker compose ps
+docker compose logs -f
+```
+
+Docker Desktop 中直接访问 loopMIDI 等宿主机 MIDI 设备不稳定。容器部署推荐输出 OSC
+到宿主机，再由 Max/MSP 或本地 MIDI Bridge 转换为 MIDI。Compose 已将默认 localhost
+OSC 输出转换为 `host.docker.internal`。
 
 ## 输入模式
 

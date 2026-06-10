@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
     app.state.websocket = WebSocketManager()
     app.state.config_store = MusicConfigStore(settings.music_defaults_path)
     app.state.midi = MidiOutput()
-    app.state.osc = OscOutput()
+    app.state.osc = OscOutput(settings.default_output_osc_ip, settings.default_output_osc_port)
     app.state.recorder = SessionRecorder(settings.session_dir)
     app.state.presets = PresetStore(settings.preset_dir)
     app.state.engine = MusicEngine(app.state.config_store.active_config, app.state.midi, app.state.osc)

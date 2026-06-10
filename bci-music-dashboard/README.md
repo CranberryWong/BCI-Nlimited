@@ -84,15 +84,58 @@ the backend remains in mock MIDI mode.
 
 ## Docker Compose
 
+Docker is the recommended deployment mode for a dedicated workstation. The frontend
+is built once and served by Nginx, which proxies `/api` and `/ws` to FastAPI. Models,
+presets, sessions, and XDF recordings stay on host-mounted directories.
+
+### Online target workstation
+
 ```bash
 cd bci-music-dashboard
 cp .env.example .env
 docker compose up --build
 ```
 
-The compose stack exposes frontend `5173`, backend `8001`, and UDP input OSC port
-`8000`. The `models` directory is mounted read-only and `backend/data` persists
-presets and sessions.
+On Windows PowerShell:
+
+```powershell
+cd bci-music-dashboard
+.\scripts\start-docker.ps1
+```
+
+Set the Windows XDF directory in `.env`, for example:
+
+```env
+HOST_XDF_ROOT_DIR=C:/Users/SJTU/.leaf/record
+```
+
+The stack exposes the dashboard on `5173`, API on `8001`, and UDP OSC input on
+`8000`.
+
+### Offline target workstation
+
+Build a transferable Linux/AMD64 bundle on the development machine:
+
+```bash
+./scripts/export-docker-bundle.sh linux/amd64
+```
+
+Copy the generated `docker-bundle/` directory to the Windows workstation. With Docker
+Desktop running in Linux container mode:
+
+```powershell
+cd D:\path\to\docker-bundle
+Set-ExecutionPolicy -Scope Process Bypass
+.\start-windows.ps1
+```
+
+The bundle contains both Docker images, Compose configuration, the model when
+available, current preset/session data, and a Windows loader. The target machine does
+not need Python, Node.js, npm, or access to a container registry.
+
+Direct host MIDI access from Docker Desktop is unreliable. For container deployment,
+send OSC to the host and convert it to MIDI in Max/MSP or a small host-side bridge.
+The Compose environment maps default localhost OSC output to `host.docker.internal`.
 
 ## Input Modes
 

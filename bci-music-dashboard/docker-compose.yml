@@ -1,22 +1,46 @@
+name: bci-music-dashboard
+
 services:
   backend:
+    image: bci-music-dashboard-backend:${BCI_IMAGE_TAG:-latest}
     build:
       context: ./backend
+    restart: unless-stopped
     env_file:
       - .env
+    environment:
+      XDF_ROOT_DIR: /xdf-records
+      MODEL_PATH: /app/models/mlp_valence_model.pkl
+      FRONTEND_ORIGIN: http://localhost:${FRONTEND_PORT:-5173}
     ports:
-      - "8001:8001"
-      - "8000:8000/udp"
+      - "${BACKEND_PORT:-8001}:8001"
+      - "${BCI_INPUT_OSC_PORT:-8000}:8000/udp"
     volumes:
       - ./models:/app/models:ro
       - ./backend/data:/app/backend/data
-      - ${XDF_ROOT_DIR:-./xdf-records}:/xdf-records
-    environment:
-      XDF_ROOT_DIR: /xdf-records
+      - "${HOST_XDF_ROOT_DIR:-./xdf-records}:/xdf-records"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/api/health', timeout=2)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   frontend:
+    image: bci-music-dashboard-frontend:${BCI_IMAGE_TAG:-latest}
     build:
       context: ./frontend
-    ports:
-      - "5173:5173"
+    restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
