@@ -44,6 +44,7 @@ export interface TrackConfig {
   velocity_range: [number, number];
   bpm: number | 'auto';
   density: number;
+  polyphony: number;
   delay_ms: number;
   note_length_ms: number;
   humanize: number;

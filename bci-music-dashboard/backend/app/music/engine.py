@@ -32,7 +32,7 @@ class MusicEngine:
                 continue
             if track.role == "melody":
                 # 新增模式切换：若 play_mode 为 "sequence"，使用预定义序列
-                if track.play_mode == "sequence":
+                if getattr(track, "play_mode", "emotion") == "sequence":
                     events.extend(self._melody_sequence(track))
                     continue
                 else:
@@ -71,10 +71,10 @@ class MusicEngine:
         velocity: int | None = None,
     ) -> list[MusicEvent]:
         # 采用 track 配置为默认
-        root_note = root_note or track.sequence_root_note
-        scale = scale or track.sequence_scale
-        low = low if low is not None else track.sequence_low
-        high = high if high is not None else track.sequence_high
+        root_note = root_note or getattr(track, "sequence_root_note", self.config.global_settings.root_note)
+        scale = scale or getattr(track, "sequence_scale", "major")
+        low = low if low is not None else int(getattr(track, "sequence_low", track.pitch_range[0]))
+        high = high if high is not None else int(getattr(track, "sequence_high", track.pitch_range[1]))
         velocity = velocity if velocity is not None else max(track.velocity_range[0], min(track.velocity_range[1], 80))
 
         # 获取确定性音序
@@ -86,7 +86,13 @@ class MusicEngine:
 
         return events
     def test_event(self, track: TrackConfig) -> list[MusicEvent]:
-        events = self._note(track, sum(track.pitch_range) // 2, max(64, track.velocity_range[0]), min(360, track.note_length_ms))
+        pitch = sum(track.pitch_range) // 2
+        events = self._voiced_notes(
+            track,
+            pitch,
+            max(64, track.velocity_range[0]),
+            min(360, track.note_length_ms),
+        )
         for event in events:
             self._dispatch(track, event)
         return events
@@ -104,13 +110,13 @@ class MusicEngine:
         randomness = self._randomness(track, emotion)
         pitch = self._pitch(track, emotion, randomness)
         velocity = self._velocity(track, emotion)
-        return self._note(track, pitch, velocity, track.note_length_ms)
+        return self._voiced_notes(track, pitch, velocity, track.note_length_ms, emotion)
 
     def _melody_sequence(self, track: TrackConfig) -> list[MusicEvent]:
-        root_note = track.sequence_root_note
-        scale = track.sequence_scale
-        low = track.sequence_low
-        high = track.sequence_high
+        root_note = getattr(track, "sequence_root_note", self.config.global_settings.root_note)
+        scale = getattr(track, "sequence_scale", "major")
+        low = int(getattr(track, "sequence_low", track.pitch_range[0]))
+        high = int(getattr(track, "sequence_high", track.pitch_range[1]))
         notes = enumerate_scale_sequence(root_note, scale, low, high)
         if not notes:
             return []
@@ -121,7 +127,7 @@ class MusicEngine:
         self.sequence_index[track.id] = idx + 1
 
         velocity = max(track.velocity_range[0], min(track.velocity_range[1], 80))
-        return self._note(track, pitch, velocity, track.note_length_ms)
+        return self._voiced_notes(track, pitch, velocity, track.note_length_ms)
     
     def _chord(self, track: TrackConfig, emotion: EmotionState) -> list[MusicEvent]:
         root = self._pitch(track, emotion, self._randomness(track, emotion) / 2)
@@ -132,14 +138,15 @@ class MusicEngine:
             "calm": (0, 7, 14),
             "neutral": (0, 4, 7),
         }
-        return [event for interval in qualities[emotion.label] for event in self._note(track, self._clamp_pitch(track, root + interval), self._velocity(track, emotion), track.note_length_ms)]
+        pitches = self._chord_pitches(track, root, qualities[emotion.label])
+        return self._notes(track, pitches, self._velocity(track, emotion), track.note_length_ms)
 
     def _bass(self, track: TrackConfig, emotion: EmotionState) -> list[MusicEvent]:
         root = root_pc(track.root_note, self.config.global_settings.root_note)
         notes = scale_notes(root, "minor" if emotion.label == "sad" else "major", *track.pitch_range) or [track.pitch_range[0]]
         pitch = notes[0] if emotion.arousal_norm < 0.65 or random.random() < 0.65 else self._clamp_pitch(track, notes[0] + 7)
         duration = track.note_length_ms * (2 if emotion.label in {"sad", "calm"} else 1)
-        return self._note(track, pitch, self._velocity(track, emotion), duration)
+        return self._voiced_notes(track, pitch, self._velocity(track, emotion), duration, emotion)
 
     def _drums(self, track: TrackConfig, emotion: EmotionState) -> list[MusicEvent]:
         notes = getattr(track, "drum_notes", {}) or {}
@@ -208,6 +215,85 @@ class MusicEngine:
         return [
             MusicEvent(timestamp=start, track_id=track.id, type="note_on", pitch=pitch, velocity=velocity, duration_ms=duration, channel=track.midi_channel),
             MusicEvent(timestamp=start + duration / 1000, track_id=track.id, type="note_off", pitch=pitch, velocity=0, duration_ms=0, channel=track.midi_channel),
+        ]
+
+    def _voiced_notes(
+        self,
+        track: TrackConfig,
+        base_pitch: int,
+        velocity: int,
+        duration: int,
+        emotion: EmotionState | None = None,
+    ) -> list[MusicEvent]:
+        pitches = self._scale_voicing(track, base_pitch, emotion)
+        return self._notes(track, pitches, velocity, duration)
+
+    def _scale_voicing(
+        self,
+        track: TrackConfig,
+        base_pitch: int,
+        emotion: EmotionState | None = None,
+    ) -> list[int]:
+        count = max(1, int(track.polyphony))
+        if count == 1 or track.role in {"drum", "cymbal", "fx"}:
+            return [self._clamp_pitch(track, base_pitch)]
+
+        profile_scale = self.config.emotion_profiles[emotion.label].scale if emotion else "major"
+        label = emotion.label if emotion else "neutral"
+        root = root_pc(track.root_note, self.config.global_settings.root_note)
+        scale = resolve_scale(track.scale, profile_scale, self.config.global_settings.scale, label)
+        available = scale_notes(root, scale, *track.pitch_range) or list(range(track.pitch_range[0], track.pitch_range[1] + 1))
+        base_index = min(range(len(available)), key=lambda index: abs(available[index] - base_pitch))
+
+        if track.role == "bass":
+            desired = [base_pitch, base_pitch + 7, base_pitch + 12, base_pitch + 19, base_pitch + 24]
+            pitches = self._nearest_unique(available, desired, count)
+        else:
+            # Scale thirds above and below the source note produce a fuller,
+            # harmonically related voicing without changing onset density.
+            offsets = [0, 2, -2, 4, -4, 6, -6, 8, -8, 10, -10, 12, -12]
+            pitches = []
+            for offset in offsets:
+                index = base_index + offset
+                if 0 <= index < len(available) and available[index] not in pitches:
+                    pitches.append(available[index])
+                if len(pitches) >= count:
+                    break
+        return sorted(pitches[:count]) or [self._clamp_pitch(track, base_pitch)]
+
+    def _chord_pitches(self, track: TrackConfig, root: int, intervals: tuple[int, ...]) -> list[int]:
+        count = max(1, int(track.polyphony))
+        candidates: list[int] = []
+        for octave in (0, 12, -12, 24, -24):
+            for interval in intervals:
+                pitch = root + interval + octave
+                if track.pitch_range[0] <= pitch <= track.pitch_range[1] and pitch not in candidates:
+                    candidates.append(pitch)
+        if len(candidates) < count:
+            candidates.extend(
+                pitch
+                for pitch in self._scale_voicing(track, root)
+                if pitch not in candidates
+            )
+        return sorted(candidates[:count]) or [self._clamp_pitch(track, root)]
+
+    @staticmethod
+    def _nearest_unique(available: list[int], desired: list[int], count: int) -> list[int]:
+        pitches: list[int] = []
+        for target in desired:
+            choices = [pitch for pitch in available if pitch not in pitches]
+            if not choices:
+                break
+            pitches.append(min(choices, key=lambda pitch: abs(pitch - target)))
+            if len(pitches) >= count:
+                break
+        return pitches
+
+    def _notes(self, track: TrackConfig, pitches: list[int], velocity: int, duration: int) -> list[MusicEvent]:
+        return [
+            event
+            for pitch in pitches
+            for event in self._note(track, pitch, velocity, duration)
         ]
 
     @staticmethod

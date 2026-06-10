@@ -122,6 +122,14 @@ backend/app/config/music_defaults.yaml
 情绪参数、音轨参数和映射权重。点击 `Apply` 后无需重启后端；点击 `Save Preset` 会把
 当前配置快照保存到 `backend/data/presets`。配置也可以导出为 YAML，或从 YAML/JSON 导入。
 
+每条非打击乐音轨有两个相互独立的密度参数：
+
+- `Onset Density`：时间事件密度，控制一段时间内触发音符事件的频繁程度。
+- `Polyphony`：纵向复音数，控制每次触发同时发出多少个音；旋律按音阶叠加声部，
+  Chord/Pad 扩展和弦声部，Bass 优先叠加五度与八度。
+
+两项设置都会随 `Save Preset` 保存。
+
 ## 输出与测试
 
 OSC 输出地址包括：

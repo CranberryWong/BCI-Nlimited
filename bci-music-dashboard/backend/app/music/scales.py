@@ -36,3 +36,7 @@ def choose_quantized(root: int, scale: str, low: int, high: int, position: float
     target_index = round(max(0.0, min(1.0, position)) * (len(notes) - 1))
     wander = max(0, round(randomness * max(1, len(notes) / 5)))
     return notes[max(0, min(len(notes) - 1, target_index + random.randint(-wander, wander)))]
+
+
+def enumerate_scale_sequence(root_note: str, scale: str, low: int, high: int) -> list[int]:
+    return scale_notes(root_pc(root_note), scale, low, high)

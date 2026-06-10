@@ -103,10 +103,11 @@ default_tracks:
     velocity_range: [35, 105]
     bpm: auto
     density: 0.6
+    polyphony: 2
     delay_ms: 125
     note_length_ms: 300
     humanize: 0.12
-    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, mapping]
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.85, arousal_to_velocity: 0.75, arousal_to_density: 0.85, probability_to_randomness: -0.6}
   - id: chord_pad_01
     name: Chord Pad
@@ -125,10 +126,11 @@ default_tracks:
     velocity_range: [20, 80]
     bpm: auto
     density: 0.25
+    polyphony: 4
     delay_ms: 500
     note_length_ms: 1800
     humanize: 0.2
-    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, mapping]
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.35, arousal_to_velocity: 0.3, arousal_to_density: 0.2, probability_to_randomness: -0.3}
   - id: bass_01
     name: Bass
@@ -147,10 +149,11 @@ default_tracks:
     velocity_range: [35, 100]
     bpm: auto
     density: 0.35
+    polyphony: 2
     delay_ms: 0
     note_length_ms: 600
     humanize: 0.08
-    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, mapping]
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.25, arousal_to_velocity: 0.55, arousal_to_density: 0.7, probability_to_randomness: -0.4}
   - id: drum_01
     name: Drum
@@ -169,6 +172,7 @@ default_tracks:
     velocity_range: [40, 120]
     bpm: auto
     density: 0.55
+    polyphony: 1
     delay_ms: 0
     note_length_ms: 120
     humanize: 0.1
@@ -192,6 +196,7 @@ default_tracks:
     velocity_range: [30, 115]
     bpm: auto
     density: 0.45
+    polyphony: 1
     delay_ms: 0
     note_length_ms: 80
     humanize: 0.12
@@ -204,6 +209,7 @@ music_parameter_schema:
   velocity_range: {type: int_range, min: 0, max: 127, editable: true}
   bpm: {type: int_or_auto, min: 30, max: 220, editable: true}
   density: {type: float, min: 0.0, max: 1.0, editable: true}
+  polyphony: {type: int, min: 1, max: 8, editable: true}
   delay_ms: {type: int, min: 0, max: 5000, editable: true}
   note_length_ms: {type: int, min: 20, max: 10000, editable: true}
   humanize: {type: float, min: 0.0, max: 1.0, editable: true}

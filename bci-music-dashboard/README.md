@@ -128,6 +128,14 @@ restarting the backend. `Save Preset` snapshots the current config into
 `backend/data/presets`. Config snapshots can be exported as YAML and imported from
 YAML or JSON.
 
+Each non-percussion track exposes two independent density controls:
+
+- `Onset Density` controls how frequently note events are triggered over time.
+- `Polyphony` controls how many notes sound at each trigger. Melody voices follow the
+  active scale, chord/pad voices extend the chord, and bass voices favor fifths and octaves.
+
+Both values are included when saving a preset.
+
 ## Outputs
 
 OSC note events use addresses such as:

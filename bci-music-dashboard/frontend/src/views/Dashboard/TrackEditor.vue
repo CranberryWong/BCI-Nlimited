@@ -16,7 +16,15 @@
         </div>
         <range-row label="Pitch Range" v-model="draft.pitch_range" :min="schema.pitch_range?.min ?? 0" :max="schema.pitch_range?.max ?? 127" />
         <range-row label="Velocity Range" v-model="draft.velocity_range" :min="schema.velocity_range?.min ?? 0" :max="schema.velocity_range?.max ?? 127" />
-        <scalar-row label="Density" v-model="draft.density" :min="schema.density?.min ?? 0" :max="schema.density?.max ?? 1" :step="0.01" />
+        <scalar-row label="Onset Density" v-model="draft.density" :min="schema.density?.min ?? 0" :max="schema.density?.max ?? 1" :step="0.01" />
+        <scalar-row
+          v-if="!['drum', 'cymbal', 'fx'].includes(draft.role)"
+          label="Polyphony"
+          v-model="draft.polyphony"
+          :min="schema.polyphony?.min ?? 1"
+          :max="schema.polyphony?.max ?? 8"
+          :step="1"
+        />
         <scalar-row label="Delay ms" v-model="draft.delay_ms" :min="schema.delay_ms?.min ?? 0" :max="schema.delay_ms?.max ?? 5000" :step="1" />
         <scalar-row label="Note Length ms" v-model="draft.note_length_ms" :min="schema.note_length_ms?.min ?? 20" :max="schema.note_length_ms?.max ?? 10000" :step="1" />
         <scalar-row label="Humanize" v-model="draft.humanize" :min="schema.humanize?.min ?? 0" :max="schema.humanize?.max ?? 1" :step="0.01" />

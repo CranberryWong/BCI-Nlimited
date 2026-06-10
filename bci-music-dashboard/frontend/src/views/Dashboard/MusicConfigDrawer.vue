@@ -43,7 +43,30 @@
                 <n-button>Import</n-button>
               </n-upload>
             </div>
-            <n-select v-model:value="selectedPreset" :options="presetOptions" placeholder="Load preset" @update:value="loadPreset" />
+            <div class="preset-section">
+              <div class="preset-heading">
+                <strong>Presets</strong>
+                <span>{{ selectedPreset ? 'Current preset selected' : 'No preset selected' }}</span>
+              </div>
+              <n-radio-group
+                :value="selectedPreset"
+                class="preset-list"
+                @update:value="loadPreset"
+              >
+                <label
+                  v-for="preset in presets"
+                  :key="preset.id"
+                  class="preset-row"
+                  :class="{ active: preset.id === selectedPreset }"
+                >
+                  <n-radio :value="preset.id" />
+                  <span class="preset-name">{{ preset.name }}</span>
+                  <n-tag v-if="preset.builtin" size="small" :bordered="false">Built-in</n-tag>
+                  <n-tag v-else size="small" type="success" :bordered="false">Custom</n-tag>
+                  <span v-if="preset.id === selectedPreset" class="current-label">Current</span>
+                </label>
+              </n-radio-group>
+            </div>
           </n-tab-pane>
         </n-tabs>
       </template>
@@ -58,8 +81,8 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NCollapse, NCollapseItem, NDrawer, NDrawerContent, NFormItem, NInput, NInputNumber, NSelect, NSlider, NTabPane, NTabs, NUpload, type UploadCustomRequestOptions } from 'naive-ui';
-import { computed, defineComponent, h, onMounted, reactive, ref, watch } from 'vue';
+import { NButton, NCollapse, NCollapseItem, NDrawer, NDrawerContent, NFormItem, NInput, NInputNumber, NRadio, NRadioGroup, NSelect, NSlider, NTabPane, NTag, NTabs, NUpload, type UploadCustomRequestOptions } from 'naive-ui';
+import { defineComponent, h, onMounted, reactive, ref, watch } from 'vue';
 import { api, downloadConfig } from '../../api/client';
 import type { EmotionProfile, MusicConfig } from '../../types';
 
@@ -68,7 +91,7 @@ const emit = defineEmits(['update:show', 'apply', 'reset', 'loaded']);
 const draft = ref<MusicConfig | null>(null);
 const presetName = ref('');
 const selectedPreset = ref<string | null>(null);
-const presets = ref<{ id: string; name: string }[]>([]);
+const presets = ref<{ id: string; name: string; builtin: boolean; active: boolean }[]>([]);
 const numericGlobal = reactive<Record<string, number>>({});
 watch(() => props.config, (config) => {
   draft.value = config ? JSON.parse(JSON.stringify(config)) : null;
@@ -96,16 +119,20 @@ function bounds(field: string) {
   const item = defaultSchema(field);
   return { min: Number(item.min ?? 0), max: Number(item.max ?? (field === 'bpm' ? 220 : 1)) };
 }
-const presetOptions = computed(() => presets.value.map((preset) => ({ label: preset.name, value: preset.id })));
 async function loadPresets() {
   presets.value = (await api.get('/presets')).data;
+  selectedPreset.value = presets.value.find((preset) => preset.active)?.id ?? null;
 }
 async function savePreset() {
-  await api.post('/presets', { name: presetName.value || 'Dashboard Preset' });
+  const saved = (await api.post('/presets', { name: presetName.value || 'Dashboard Preset' })).data;
   await loadPresets();
+  selectedPreset.value = saved.id;
+  presetName.value = '';
 }
 async function loadPreset(id: string) {
   const config = (await api.post(`/presets/${id}/load`)).data;
+  selectedPreset.value = id;
+  presets.value = presets.value.map((preset) => ({ ...preset, active: preset.id === id }));
   emit('loaded', config);
 }
 async function importConfig(options: UploadCustomRequestOptions) {
@@ -159,5 +186,60 @@ const ProfileScalar = defineComponent({
 }
 .n-select {
   width: 100%;
+}
+
+.preset-section {
+  margin-top: 22px;
+}
+
+.preset-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.preset-heading span {
+  color: #5f6872;
+  font-size: 12px;
+}
+
+.preset-list {
+  display: grid;
+  border: 1px solid #d9dde3;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.preset-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.preset-row + .preset-row {
+  border-top: 1px solid #d9dde3;
+}
+
+.preset-row:hover,
+.preset-row.active {
+  background: #f3f5f7;
+}
+
+.preset-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.current-label {
+  color: #111;
+  font-size: 12px;
+  font-weight: 600;
 }
 </style>

@@ -62,6 +62,7 @@ export const useTracksStore = defineStore('tracks', {
           velocity_range: [30, 100],
           bpm: 'auto',
           density: 0.5,
+          polyphony: role === 'pad' || role === 'chord' ? 3 : role === 'melody' || role === 'bass' ? 2 : 1,
           delay_ms: 0,
           note_length_ms: 250,
           humanize: 0.1,

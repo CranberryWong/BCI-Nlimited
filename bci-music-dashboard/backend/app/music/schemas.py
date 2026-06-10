@@ -52,6 +52,7 @@ class TrackConfig(BaseModel):
     velocity_range: tuple[int, int] = (30, 100)
     bpm: int | Literal["auto"] = "auto"
     density: float = Field(default=0.5, ge=0.0, le=1.0)
+    polyphony: int = Field(default=1, ge=1, le=8)
     delay_ms: int = Field(default=0, ge=0, le=5000)
     note_length_ms: int = Field(default=250, ge=20, le=10000)
     humanize: float = Field(default=0.1, ge=0.0, le=1.0)
