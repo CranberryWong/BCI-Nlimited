@@ -5,6 +5,48 @@ from fastapi.responses import Response
 router = APIRouter(prefix="/api", tags=["music-config"])
 
 
+@router.get("/music-generator/status")
+def music_generator_status(request: Request):
+    return request.app.state.music_generator.status()
+
+
+@router.get("/music-generator/themes")
+def music_generator_themes(request: Request):
+    return request.app.state.theme_library.list()
+
+
+@router.put("/music-generator/theme/{theme_id}")
+def select_music_generator_theme(theme_id: str, request: Request):
+    try:
+        return request.app.state.music_generator.select_theme(theme_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@router.post("/music-generator/random-theme")
+def random_music_generator_theme(request: Request):
+    try:
+        return request.app.state.music_generator.randomize_theme()
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@router.patch("/music-generator/settings")
+def update_music_generator_settings(payload: dict, request: Request):
+    try:
+        return request.app.state.music_generator.update_settings(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/music-generator/mode")
+async def set_music_generator_mode(payload: dict, request: Request):
+    mode = payload.get("system_mode") or payload.get("mode")
+    if mode not in {"MIRROR", "ENGAGING"}:
+        raise HTTPException(status_code=422, detail="system_mode must be MIRROR or ENGAGING")
+    return await request.app.state.music_generator.set_system_mode(mode)
+
+
 @router.get("/music/config")
 def get_music_config(request: Request):
     return request.app.state.config_store.api_payload()

@@ -27,10 +27,27 @@ class MidiOutput:
         return self.status
 
     def send_event(self, track: TrackConfig, event: MusicEvent) -> None:
-        if event.type not in {"note_on", "note_off"} or event.pitch is None:
-            return
         port = self._ensure_port()
         if port is None:
+            return
+        if event.type == "control" and len(event.args) >= 2:
+            control = {
+                "expression": 11,
+                "intensity": 1,
+                "brightness": 74,
+                "reverb": 91,
+                "filter": 74,
+            }.get(str(event.args[0]))
+            if control is not None:
+                value = round(max(0.0, min(1.0, float(event.args[1]))) * 127)
+                port.send(mido.Message(
+                    "control_change",
+                    channel=max(0, track.midi_channel - 1),
+                    control=control,
+                    value=value,
+                ))
+            return
+        if event.type not in {"note_on", "note_off"} or event.pitch is None:
             return
         port.send(
             mido.Message(
@@ -40,6 +57,13 @@ class MidiOutput:
                 channel=max(0, track.midi_channel - 1),
             )
         )
+
+    def all_notes_off(self) -> None:
+        port = self._ensure_port()
+        if port is None:
+            return
+        for channel in range(16):
+            port.send(mido.Message("control_change", channel=channel, control=123, value=0))
 
     def _ensure_port(self):
         if self.status.mode != "rtmidi":

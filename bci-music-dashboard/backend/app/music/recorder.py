@@ -10,7 +10,7 @@ from typing import Any
 import mido
 import yaml
 
-from app.music.schemas import EmotionState, MusicEvent
+from app.music.schemas import EmotionState, MusicEvent, MusicSegment
 
 
 class SessionRecorder:
@@ -22,6 +22,10 @@ class SessionRecorder:
         self.started_at: float | None = None
         self.emotions: list[EmotionState] = []
         self.events: list[MusicEvent] = []
+        self.segments: list[MusicSegment] = []
+        self.generator_statuses: list[dict[str, Any]] = []
+        self.model_metadata: dict[str, Any] = {}
+        self.composition_metadata: dict[str, Any] = {}
 
     def start(self, config_snapshot: dict[str, Any]) -> str:
         if self.active_id:
@@ -32,6 +36,9 @@ class SessionRecorder:
         self.started_at = time.time()
         self.emotions = []
         self.events = []
+        self.segments = []
+        self.generator_statuses = []
+        self.composition_metadata = {}
         (self.active_dir / "music_config_snapshot.yaml").write_text(
             yaml.safe_dump(config_snapshot, allow_unicode=True, sort_keys=False),
             encoding="utf-8",
@@ -50,6 +57,9 @@ class SessionRecorder:
         self.started_at = None
         self.emotions = []
         self.events = []
+        self.segments = []
+        self.generator_statuses = []
+        self.composition_metadata = {}
         return session_id
 
     def record_emotion(self, emotion: EmotionState) -> None:
@@ -59,6 +69,37 @@ class SessionRecorder:
     def record_event(self, event: MusicEvent) -> None:
         if self.active_id:
             self.events.append(event)
+
+    def record_segment(self, segment: MusicSegment) -> None:
+        if self.active_id:
+            self.segments.append(segment)
+            self.composition_metadata = {
+                "theme_id": segment.theme_id,
+                "form_section": segment.form_section,
+                "phrase_id": segment.phrase_id,
+                "theme_similarity": segment.theme_similarity,
+                "harmony": segment.harmony,
+                "actual_max_voices": segment.actual_max_voices,
+                "harmony_note_count": segment.harmony_note_count,
+                "notochord_modified_count": segment.notochord_modified_count,
+                "melody_notes": [
+                    {
+                        "beat": note.beat,
+                        "pitch": note.pitch,
+                        "voice_role": note.voice_role,
+                        "generated_by": note.generated_by,
+                    }
+                    for note in segment.notes
+                    if note.voice_role is not None
+                ],
+            }
+
+    def record_generator_status(self, status: dict[str, Any]) -> None:
+        if self.active_id:
+            self.generator_statuses.append({"timestamp": time.time(), **status})
+
+    def set_model_metadata(self, metadata: dict[str, Any]) -> None:
+        self.model_metadata = metadata
 
     def list_sessions(self) -> list[dict[str, Any]]:
         sessions = []
@@ -74,6 +115,10 @@ class SessionRecorder:
             "emotion-jsonl": "emotion_timeline.jsonl",
             "music-jsonl": "music_event_log.jsonl",
             "config": "music_config_snapshot.yaml",
+            "segments": "music_segments.jsonl",
+            "generator-status": "generator_status.json",
+            "model-metadata": "model_metadata.json",
+            "composition-metadata": "composition_metadata.json",
         }
         if file_format not in filenames:
             raise KeyError(file_format)
@@ -90,6 +135,21 @@ class SessionRecorder:
         with (self.active_dir / "music_event_log.jsonl").open("w", encoding="utf-8") as handle:
             for event in self.events:
                 handle.write(json.dumps(event.model_dump(), ensure_ascii=False) + "\n")
+        with (self.active_dir / "music_segments.jsonl").open("w", encoding="utf-8") as handle:
+            for segment in self.segments:
+                handle.write(json.dumps(segment.model_dump(), ensure_ascii=False) + "\n")
+        (self.active_dir / "generator_status.json").write_text(
+            json.dumps(self.generator_statuses, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        (self.active_dir / "model_metadata.json").write_text(
+            json.dumps(self.model_metadata, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        (self.active_dir / "composition_metadata.json").write_text(
+            json.dumps(self.composition_metadata, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
 
     def _flush_csv(self) -> None:
         assert self.active_dir

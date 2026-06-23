@@ -9,7 +9,7 @@
       <n-button :disabled="!active" @click="stop">Stop Recording</n-button>
       <n-button @click="load">Refresh</n-button>
     </div>
-    <p>录制期间会保存情绪时间序列、Music Events、MIDI 文件和音乐配置快照。</p>
+    <p>录制期间会保存情绪、MIDI、主题、曲式、和声、变奏与模型元数据。</p>
     <div class="session-table">
       <n-data-table :columns="columns" :data="sessions" size="small" />
     </div>
@@ -55,6 +55,10 @@ const exports = [
   { file: 'emotion_timeline.jsonl', format: 'emotion-jsonl' },
   { file: 'music_event_log.jsonl', format: 'music-jsonl' },
   { file: 'music_config_snapshot.yaml', format: 'config' },
+  { file: 'music_segments.jsonl', format: 'segments' },
+  { file: 'generator_status.json', format: 'generator-status' },
+  { file: 'model_metadata.json', format: 'model-metadata' },
+  { file: 'composition_metadata.json', format: 'composition-metadata' },
 ];
 onMounted(load);
 </script>

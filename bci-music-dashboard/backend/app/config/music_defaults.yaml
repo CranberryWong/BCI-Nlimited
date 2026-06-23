@@ -10,7 +10,7 @@ global:
     editable: true
   scale:
     default: auto
-    options: [auto, major, minor, pentatonic, chromatic, dorian, lydian, phrygian]
+    options: [auto, major, minor, pentatonic, chromatic, dorian, lydian, phrygian, gong, shang, jue, zhi, yu]
     editable: true
   quantization:
     default: 1/8
@@ -27,7 +27,7 @@ global:
 emotion_profiles:
   joy:
     label_zh: 高兴
-    scale: major
+    scale: gong
     bpm_range: [100, 140]
     pitch_range: [60, 88]
     velocity_range: [60, 115]
@@ -39,7 +39,7 @@ emotion_profiles:
     editable: true
   calm:
     label_zh: 平静
-    scale: pentatonic
+    scale: gong
     bpm_range: [55, 90]
     pitch_range: [48, 76]
     velocity_range: [25, 70]
@@ -51,7 +51,7 @@ emotion_profiles:
     editable: true
   neutral:
     label_zh: 中性
-    scale: major
+    scale: shang
     bpm_range: [75, 110]
     pitch_range: [52, 80]
     velocity_range: [40, 85]
@@ -63,7 +63,7 @@ emotion_profiles:
     editable: true
   tense:
     label_zh: 紧张
-    scale: chromatic
+    scale: jue
     bpm_range: [110, 165]
     pitch_range: [55, 92]
     velocity_range: [70, 125]
@@ -75,7 +75,7 @@ emotion_profiles:
     editable: true
   sad:
     label_zh: 悲伤
-    scale: minor
+    scale: yu
     bpm_range: [40, 75]
     pitch_range: [36, 68]
     velocity_range: [20, 65]
@@ -87,11 +87,11 @@ emotion_profiles:
     editable: true
 default_tracks:
   - id: piano_melody_01
-    name: Piano Melody
+    name: Xylophone Melody
     enabled: true
     compute_enabled: true
     role: melody
-    instrument: piano
+    instrument: xylophone
     output_type: osc
     target_ip: 127.0.0.1
     target_port: 57120
@@ -99,18 +99,49 @@ default_tracks:
     midi_program: 0
     root_note: auto
     scale: auto
-    pitch_range: [60, 84]
+    pitch_range: [48, 84]
     velocity_range: [35, 105]
     bpm: auto
     density: 0.6
-    polyphony: 2
+    polyphony: 3
+    voicing_enabled: true
+    voicing_density: 0.55
+    notochord_revoice_rate: 0.25
+    arpeggio_enabled: true
+    arpeggio_density: 0.45
+    arpeggio_rate: "1/8"
+    arpeggio_max_group_notes: 5
+    arpeggio_notochord_rate: 0.2
     delay_ms: 125
     note_length_ms: 300
     humanize: 0.12
-    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, voicing_enabled, voicing_density, notochord_revoice_rate, arpeggio_enabled, arpeggio_density, arpeggio_rate, arpeggio_max_group_notes, arpeggio_notochord_rate, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.85, arousal_to_velocity: 0.75, arousal_to_density: 0.85, probability_to_randomness: -0.6}
+  - id: piano_chord_01
+    name: Legacy Piano Accompaniment
+    enabled: false
+    compute_enabled: false
+    role: chord
+    instrument: piano
+    output_type: osc
+    target_ip: 127.0.0.1
+    target_port: 57120
+    midi_channel: 2
+    midi_program: 0
+    root_note: auto
+    scale: auto
+    pitch_range: [40, 60]
+    velocity_range: [20, 80]
+    bpm: auto
+    density: 0.25
+    polyphony: 2
+    delay_ms: 500
+    note_length_ms: 1800
+    humanize: 0.2
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
+    mapping: {valence_to_pitch: 0.35, arousal_to_velocity: 0.3, arousal_to_density: 0.2, probability_to_randomness: -0.3}
   - id: chord_pad_01
-    name: Chord Pad
+    name: Sustained Harmony Pad
     enabled: true
     compute_enabled: true
     role: pad
@@ -118,7 +149,7 @@ default_tracks:
     output_type: osc
     target_ip: 127.0.0.1
     target_port: 57120
-    midi_channel: 2
+    midi_channel: 5
     midi_program: 88
     root_note: auto
     scale: auto
@@ -133,7 +164,7 @@ default_tracks:
     editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.35, arousal_to_velocity: 0.3, arousal_to_density: 0.2, probability_to_randomness: -0.3}
   - id: bass_01
-    name: Bass
+    name: Harmonic Bass
     enabled: true
     compute_enabled: true
     role: bass
@@ -188,7 +219,7 @@ default_tracks:
     output_type: osc
     target_ip: 127.0.0.1
     target_port: 57120
-    midi_channel: 10
+    midi_channel: 11
     midi_program: null
     root_note: C
     scale: chromatic
@@ -204,12 +235,100 @@ default_tracks:
     arousal_rise_threshold: 0.18
     editable_params: [enabled, compute_enabled, output_type, target_ip, target_port, midi_channel, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, trigger_on_arousal_rise, arousal_rise_threshold, mapping]
     mapping: {valence_to_pitch: 0.0, arousal_to_velocity: 0.85, arousal_to_density: 0.95, probability_to_randomness: -0.1}
+system_modes:
+  MIRROR:
+    smoothing: 0.25
+    emotion_mappings:
+      calm:
+        tempo: 68
+        density: 0.25
+        velocity: 0.35
+        register: mid_high
+        scale: major_pentatonic
+        mode: soft
+        instruments: {xylophone: 0.45, pad: 0.35, bass: 0.2}
+        reverb: 0.68
+        delay: 0.22
+        rhythm_complexity: 0.2
+        brightness: 0.62
+        tension: 0.06
+      joy:
+        tempo: 116
+        density: 0.82
+        velocity: 0.78
+        register: high
+        scale: bright_pentatonic
+        mode: major
+        instruments: {xylophone: 0.5, pad: 0.2, drum: 0.2, cymbal: 0.1}
+        reverb: 0.45
+        delay: 0.18
+        rhythm_complexity: 0.62
+        brightness: 0.9
+        tension: 0.12
+      neutral:
+        tempo: 88
+        density: 0.5
+        velocity: 0.52
+        register: mid
+        scale: gong
+        mode: stable
+        instruments: {xylophone: 0.45, pad: 0.25, bass: 0.2, drum: 0.1}
+        reverb: 0.32
+        delay: 0.1
+        rhythm_complexity: 0.35
+        brightness: 0.52
+        tension: 0.1
+      sad:
+        tempo: 62
+        density: 0.22
+        velocity: 0.32
+        register: low
+        scale: yu
+        mode: dark_pentatonic
+        instruments: {xylophone: 0.28, pad: 0.42, bass: 0.3}
+        reverb: 0.72
+        delay: 0.24
+        rhythm_complexity: 0.18
+        brightness: 0.28
+        tension: 0.32
+      tense:
+        tempo: 126
+        density: 0.76
+        velocity: 0.74
+        register: wide
+        scale: jue
+        mode: controlled_tension
+        instruments: {xylophone: 0.38, bass: 0.22, drum: 0.28, cymbal: 0.12}
+        reverb: 0.26
+        delay: 0.36
+        rhythm_complexity: 0.82
+        brightness: 0.48
+        tension: 0.78
+  ENGAGING:
+    duration_sec: 240
+    smoothing: 0.18
+    target_state: {valence: 0.85, arousal: 0.65, tension: 0.2, agency: 0.8}
+    stages:
+      - {name: Resonance, start: 0, end: 40}
+      - {name: Regulation, start: 40, end: 90}
+      - {name: Activation, start: 90, end: 150}
+      - {name: Elevation, start: 150, end: 220}
+      - {name: Integration, start: 220, end: 240}
+    initial_emotion_paths:
+      tense: [grounding, release, joy_calm]
+      sad: [warmth, movement, uplift]
+      neutral: [curiosity, joy, elevation]
+      calm: [openness, gentle_joy]
+      joy: [collective_elevation, integrated_calm]
 music_parameter_schema:
   pitch_range: {type: int_range, min: 0, max: 127, editable: true}
   velocity_range: {type: int_range, min: 0, max: 127, editable: true}
   bpm: {type: int_or_auto, min: 30, max: 220, editable: true}
   density: {type: float, min: 0.0, max: 1.0, editable: true}
   polyphony: {type: int, min: 1, max: 8, editable: true}
+  arpeggio_density: {type: float, min: 0.0, max: 1.0, editable: true}
+  arpeggio_max_group_notes: {type: int, min: 2, max: 5, editable: true}
+  arpeggio_notochord_rate: {type: float, min: 0.0, max: 0.5, editable: true}
   delay_ms: {type: int, min: 0, max: 5000, editable: true}
   note_length_ms: {type: int, min: 20, max: 10000, editable: true}
   humanize: {type: float, min: 0.0, max: 1.0, editable: true}

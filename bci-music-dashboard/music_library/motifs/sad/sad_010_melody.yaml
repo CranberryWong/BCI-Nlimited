@@ -1,0 +1,465 @@
+id: sad_010_melody
+title: Subdued Portrait
+source_type: lyria_generated
+emotion: sad
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 48
+home_key: C
+mode: yu
+tempo_hint: 60
+pitch_range:
+- 28
+- 80
+phrases:
+- id: A
+  bars:
+  - 1
+  - 48
+  role: motif
+  anchors: &id001
+  - 8.041
+  - 10.223
+  - 16.032
+  - 18.168
+  - 24.023
+  - 26.091
+  - 30.086
+  - 32.25
+  - 190.268
+  cadence: authentic
+anchors: *id001
+immutable_beats:
+- 8.041
+- 10.223
+- 16.032
+- 18.168
+- 190.268
+mutable_beats:
+- 1.091
+- 1.695
+- 2.577
+- 5.527
+- 6.155
+- 9.5
+- 13.964
+- 17.427
+- 24.023
+- 25.395
+- 26.091
+- 30.086
+- 32.109
+- 32.25
+- 36.082
+- 40.082
+- 40.868
+- 41.405
+- 42.145
+- 44.077
+- 44.264
+- 46.118
+- 48.073
+- 48.7
+- 49.373
+- 50.118
+- 52.068
+- 54.091
+- 56.091
+- 56.714
+- 57.368
+- 58.155
+- 58.782
+- 59.386
+- 60.064
+- 60.527
+- 62.082
+- 62.477
+- 63.314
+- 64.036
+- 64.709
+- 65.405
+- 66.077
+- 66.518
+- 68.077
+- 68.936
+- 70.077
+- 70.309
+- 71.423
+- 72.073
+- 72.723
+- 73.005
+- 73.4
+- 74.141
+- 75.464
+- 76.073
+- 76.255
+- 78.068
+- 80.068
+- 80.718
+- 81.345
+- 82.064
+- 83.6
+- 84.064
+- 86.082
+- 88.059
+- 88.782
+- 89.382
+- 90.082
+- 90.682
+- 91.382
+- 92.082
+- 94.123
+- 96.145
+- 96.727
+- 97.377
+- 98.073
+- 98.35
+- 98.723
+- 99.4
+- 100.073
+- 102.186
+- 104.023
+- 104.509
+- 104.859
+- 105.414
+- 106.091
+- 106.741
+- 107.391
+- 108.064
+- 108.741
+- 109.391
+- 110.086
+- 110.409
+- 110.759
+- 111.364
+- 112.064
+- 112.714
+- 113.432
+- 114.059
+- 114.873
+- 115.386
+- 116.082
+- 116.732
+- 117.359
+- 118.055
+- 118.518
+- 118.727
+- 119.382
+- 120.1
+- 120.75
+- 121.4
+- 122.1
+- 122.75
+- 123.355
+- 124.168
+- 124.745
+- 125.395
+- 126.095
+- 126.768
+- 127.35
+- 128.073
+- 128.277
+- 128.745
+- 129.395
+- 130.114
+- 130.718
+- 131.136
+- 131.418
+- 132.045
+- 132.764
+- 133.182
+- 133.482
+- 134.064
+- 134.782
+- 135.368
+- 136.086
+- 136.736
+- 137.409
+- 137.691
+- 138.2
+- 138.759
+- 139.386
+- 140.059
+- 140.732
+- 141.382
+- 142.127
+- 142.732
+- 143.336
+- 144.077
+- 144.755
+- 145.382
+- 146.123
+- 146.705
+- 147.005
+- 147.309
+- 147.45
+- 147.636
+- 148.077
+- 148.705
+- 149.355
+- 150.073
+- 150.35
+- 150.723
+- 151.355
+- 152.05
+- 152.723
+- 153.395
+- 154.068
+- 154.509
+- 155.232
+- 158.091
+- 160.136
+- 160.736
+- 161.436
+- 162.086
+- 162.618
+- 164.318
+- 166.105
+- 168.127
+- 168.732
+- 169.405
+- 170.1
+- 173.355
+- 174.191
+- 176.05
+- 176.723
+- 177.395
+- 178.118
+- 179.791
+- 180.418
+- 184.091
+- 184.741
+- 185.436
+- 186.25
+- 187.018
+- 187.759
+- 187.945
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: I
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: I
+- bars:
+  - 5
+  - 5
+  chord: I
+- bars:
+  - 6
+  - 6
+  chord: I
+- bars:
+  - 7
+  - 7
+  chord: I
+- bars:
+  - 8
+  - 8
+  chord: I
+- bars:
+  - 9
+  - 9
+  chord: I
+- bars:
+  - 10
+  - 10
+  chord: I
+- bars:
+  - 11
+  - 11
+  chord: I
+- bars:
+  - 12
+  - 12
+  chord: I
+- bars:
+  - 13
+  - 13
+  chord: I
+- bars:
+  - 14
+  - 14
+  chord: I
+- bars:
+  - 15
+  - 15
+  chord: I
+- bars:
+  - 16
+  - 16
+  chord: I
+- bars:
+  - 17
+  - 17
+  chord: I
+- bars:
+  - 18
+  - 18
+  chord: I
+- bars:
+  - 19
+  - 19
+  chord: I
+- bars:
+  - 20
+  - 20
+  chord: I
+- bars:
+  - 21
+  - 21
+  chord: I
+- bars:
+  - 22
+  - 22
+  chord: I
+- bars:
+  - 23
+  - 23
+  chord: I
+- bars:
+  - 24
+  - 24
+  chord: I
+- bars:
+  - 25
+  - 25
+  chord: I
+- bars:
+  - 26
+  - 26
+  chord: I
+- bars:
+  - 27
+  - 27
+  chord: I
+- bars:
+  - 28
+  - 28
+  chord: I
+- bars:
+  - 29
+  - 29
+  chord: I
+- bars:
+  - 30
+  - 30
+  chord: I
+- bars:
+  - 31
+  - 31
+  chord: I
+- bars:
+  - 32
+  - 32
+  chord: I
+- bars:
+  - 33
+  - 33
+  chord: I
+- bars:
+  - 34
+  - 34
+  chord: I
+- bars:
+  - 35
+  - 35
+  chord: I
+- bars:
+  - 36
+  - 36
+  chord: I
+- bars:
+  - 37
+  - 37
+  chord: I
+- bars:
+  - 38
+  - 38
+  chord: I
+- bars:
+  - 39
+  - 39
+  chord: I
+- bars:
+  - 40
+  - 40
+  chord: I
+- bars:
+  - 41
+  - 41
+  chord: I
+- bars:
+  - 42
+  - 42
+  chord: I
+- bars:
+  - 43
+  - 43
+  chord: I
+- bars:
+  - 44
+  - 44
+  chord: I
+- bars:
+  - 45
+  - 45
+  chord: I
+- bars:
+  - 46
+  - 46
+  chord: I
+- bars:
+  - 47
+  - 47
+  chord: I
+- bars:
+  - 48
+  - 48
+  chord: I
+variation_allowed:
+  transpose:
+  - -2
+  - 2
+  octave_shift:
+  - -12
+  - 12
+  rhythm_expand: true
+  rhythm_compress: true
+  ornament: true
+  delete_mutable_notes: true
+  repeat_motif: true
+  arpeggiate: true
+  notochord_fill: true
+portrait_behavior:
+  rhythm_profile: sparse_breathing
+  articulation: soft_legato
+  arpeggio_shape: falling_fragments
+  harmony_color: minor_warm
+  register_motion: descending
+  texture_density: low
+  transition_style: warmth
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+quality:
+  approved: false
+  notes: draft generated by analyze_motif.py; human review required

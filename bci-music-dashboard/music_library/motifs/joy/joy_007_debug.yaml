@@ -1,0 +1,145 @@
+id: joy_007_debug
+title: Joy Debug
+source_type: lyria_generated
+emotion: joy
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 108
+pitch_range:
+- 57
+- 84
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: motif_debug
+  anchors: &id001
+  - 15.723
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 15.723
+mutable_beats:
+- 0.364
+- 0.573
+- 0.759
+- 0.991
+- 1.223
+- 1.432
+- 1.641
+- 2.105
+- 2.314
+- 2.523
+- 2.709
+- 3.132
+- 3.341
+- 3.55
+- 3.782
+- 3.991
+- 4.2
+- 4.409
+- 4.805
+- 5.036
+- 5.245
+- 5.5
+- 5.732
+- 5.918
+- 6.127
+- 6.336
+- 6.568
+- 6.777
+- 6.986
+- 7.195
+- 7.405
+- 7.614
+- 7.823
+- 8.055
+- 8.264
+- 8.473
+- 8.659
+- 8.891
+- 9.1
+- 9.332
+- 9.541
+- 9.75
+- 9.936
+- 10.168
+- 10.4
+- 10.609
+- 10.841
+- 11.032
+- 11.45
+- 11.891
+- 12.077
+- 12.332
+- 12.518
+- 12.75
+- 12.886
+- 13.168
+- 13.355
+- 13.586
+- 13.795
+- 14.214
+- 14.445
+- 14.632
+- 14.886
+- 15.05
+- 15.282
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: vi
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - -2
+  - 2
+  octave_shift:
+  - -12
+  - 12
+  rhythm_expand: true
+  rhythm_compress: true
+  ornament: true
+  delete_mutable_notes: true
+  repeat_motif: true
+  arpeggiate: true
+  notochord_fill: true
+portrait_behavior:
+  rhythm_profile: buoyant
+  articulation: light_staccato
+  arpeggio_shape: upward_sparkle
+  harmony_color: bright_open
+  register_motion: rising
+  texture_density: high
+  transition_style: lift
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+quality:
+  approved: true
+  notes: temporary debug motif auto-clipped from longer melody; replace with human-approved
+    edit before production

@@ -19,12 +19,73 @@
         <scalar-row label="Onset Density" v-model="draft.density" :min="schema.density?.min ?? 0" :max="schema.density?.max ?? 1" :step="0.01" />
         <scalar-row
           v-if="!['drum', 'cymbal', 'fx'].includes(draft.role)"
-          label="Polyphony"
+          :label="draft.role === 'melody' ? 'Max Melody Voices' : 'Polyphony'"
           v-model="draft.polyphony"
           :min="schema.polyphony?.min ?? 1"
           :max="schema.polyphony?.max ?? 8"
           :step="1"
         />
+        <template v-if="draft.role === 'melody'">
+          <n-form-item label="Theme Voicing">
+            <n-switch
+              :value="draft.voicing_enabled !== false"
+              @update:value="draft.voicing_enabled = $event"
+            />
+          </n-form-item>
+          <scalar-row
+            label="Voicing Density"
+            :model-value="extraNumber('voicing_density', 0.55)"
+            :min="0"
+            :max="1"
+            :step="0.05"
+            @update:model-value="draft.voicing_density = $event"
+          />
+          <scalar-row
+            label="Notochord Revoice Rate"
+            :model-value="extraNumber('notochord_revoice_rate', 0.25)"
+            :min="0"
+            :max="0.5"
+            :step="0.05"
+            @update:model-value="draft.notochord_revoice_rate = $event"
+          />
+          <n-form-item label="Melody Arpeggio">
+            <n-switch
+              :value="draft.arpeggio_enabled !== false"
+              @update:value="draft.arpeggio_enabled = $event"
+            />
+          </n-form-item>
+          <scalar-row
+            label="Arpeggio Density"
+            :model-value="extraNumber('arpeggio_density', 0.45)"
+            :min="schema.arpeggio_density?.min ?? 0"
+            :max="schema.arpeggio_density?.max ?? 1"
+            :step="0.05"
+            @update:model-value="draft.arpeggio_density = $event"
+          />
+          <n-form-item label="Arpeggio Rate">
+            <n-select
+              :value="String(draft.arpeggio_rate ?? '1/8')"
+              :options="arpeggioRateOptions"
+              @update:value="draft.arpeggio_rate = $event"
+            />
+          </n-form-item>
+          <scalar-row
+            label="Arpeggio Max Group Notes"
+            :model-value="extraNumber('arpeggio_max_group_notes', 5)"
+            :min="schema.arpeggio_max_group_notes?.min ?? 2"
+            :max="schema.arpeggio_max_group_notes?.max ?? 5"
+            :step="1"
+            @update:model-value="draft.arpeggio_max_group_notes = $event"
+          />
+          <scalar-row
+            label="Arpeggio Notochord Rate"
+            :model-value="extraNumber('arpeggio_notochord_rate', 0.2)"
+            :min="schema.arpeggio_notochord_rate?.min ?? 0"
+            :max="schema.arpeggio_notochord_rate?.max ?? 0.5"
+            :step="0.05"
+            @update:model-value="draft.arpeggio_notochord_rate = $event"
+          />
+        </template>
         <scalar-row label="Delay ms" v-model="draft.delay_ms" :min="schema.delay_ms?.min ?? 0" :max="schema.delay_ms?.max ?? 5000" :step="1" />
         <scalar-row label="Note Length ms" v-model="draft.note_length_ms" :min="schema.note_length_ms?.min ?? 20" :max="schema.note_length_ms?.max ?? 10000" :step="1" />
         <scalar-row label="Humanize" v-model="draft.humanize" :min="schema.humanize?.min ?? 0" :max="schema.humanize?.max ?? 1" :step="0.01" />
@@ -101,7 +162,8 @@ function extraNumber(key: string, fallback: number) {
 const roleOptions = ['melody', 'chord', 'bass', 'drum', 'cymbal', 'pad', 'fx'].map((value) => ({ label: value, value }));
 const outputOptions = ['osc', 'midi'].map((value) => ({ label: value.toUpperCase(), value }));
 const rootOptions = ['auto', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].map((value) => ({ label: value, value }));
-const scaleOptions = ['auto', 'major', 'minor', 'pentatonic', 'chromatic', 'dorian', 'lydian', 'phrygian'].map((value) => ({ label: value, value }));
+const scaleOptions = ['auto', 'major', 'minor', 'pentatonic', 'chromatic', 'dorian', 'lydian', 'phrygian', 'gong', 'shang', 'jue', 'zhi', 'yu'].map((value) => ({ label: value, value }));
+const arpeggioRateOptions = ['1/8', '1/16'].map((value) => ({ label: value, value }));
 
 const ScalarRow = defineComponent({
   props: { modelValue: Number, label: String, min: Number, max: Number, step: Number },

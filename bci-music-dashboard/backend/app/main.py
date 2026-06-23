@@ -11,9 +11,14 @@ from app.core.process_manager import ProcessManager
 from app.core.websocket_manager import WebSocketManager
 from app.music.config_loader import MusicConfigStore
 from app.music.engine import MusicEngine
+from app.music.generation.model import MelodyModel
+from app.music.generation.motif_library import MotifLibrary
+from app.music.generation.runtime import MusicGenerationRuntime
+from app.music.generation.theme_library import ThemeLibrary
 from app.music.midi_output import MidiOutput
 from app.music.osc_output import OscOutput
 from app.music.recorder import SessionRecorder
+from app.music.schemas import MusicGeneratorConfig
 from app.storage.presets import PresetStore
 
 
@@ -29,7 +34,53 @@ async def lifespan(app: FastAPI):
     app.state.recorder = SessionRecorder(settings.session_dir)
     app.state.presets = PresetStore(settings.preset_dir)
     app.state.engine = MusicEngine(app.state.config_store.active_config, app.state.midi, app.state.osc)
-    app.state.runtime = ProcessManager(settings, app.state.websocket, app.state.config_store, app.state.engine, app.state.recorder)
+    app.state.melody_model = MelodyModel(
+        settings.resolved_music_model_path,
+        settings.resolved_music_model_config_path,
+        provider=settings.music_model_provider,
+        notochord_checkpoint=settings.resolved_notochord_checkpoint,
+        notochord_device=settings.notochord_device,
+        notochord_instrument=settings.notochord_instrument,
+    )
+    app.state.melody_model.load()
+    app.state.theme_library = ThemeLibrary(settings.resolved_music_library_path)
+    app.state.motif_library = MotifLibrary(settings.resolved_music_library_path)
+    generator_config = MusicGeneratorConfig(
+        model_provider=settings.music_model_provider,
+        model_path=str(settings.resolved_music_model_path),
+        model_config_path=str(settings.resolved_music_model_config_path),
+        notochord_checkpoint=str(settings.resolved_notochord_checkpoint),
+        notochord_device=settings.notochord_device,
+        notochord_instrument=settings.notochord_instrument,
+        system_modes=app.state.config_store.active_config.system_modes,
+    )
+    runtime_holder = {}
+
+    def dispatch(event):
+        runtime_holder["runtime"].dispatch_generated_event(event)
+
+    app.state.music_generator = MusicGenerationRuntime(
+        generator_config,
+        app.state.config_store.active_config,
+        app.state.melody_model,
+        app.state.theme_library,
+        app.state.motif_library,
+        dispatch,
+        app.state.engine.all_notes_off,
+        app.state.websocket.broadcast,
+        app.state.recorder.record_segment,
+        app.state.recorder.record_generator_status,
+    )
+    app.state.runtime = ProcessManager(
+        settings,
+        app.state.websocket,
+        app.state.config_store,
+        app.state.engine,
+        app.state.recorder,
+        app.state.music_generator,
+    )
+    runtime_holder["runtime"] = app.state.runtime
+    app.state.recorder.set_model_metadata(app.state.melody_model.public_metadata())
     await app.state.runtime.startup()
     yield
     await app.state.runtime.shutdown()

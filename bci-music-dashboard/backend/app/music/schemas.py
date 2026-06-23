@@ -7,9 +7,14 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 EmotionLabel = Literal["joy", "calm", "neutral", "tense", "sad"]
+SystemMode = Literal["MIRROR", "ENGAGING"]
+FormSection = Literal["intro", "theme", "variation", "development", "climax", "return", "coda"]
 TrackRole = Literal["melody", "chord", "bass", "drum", "cymbal", "pad", "fx"]
 OutputType = Literal["midi", "osc"]
 MusicEventType = Literal["note_on", "note_off", "control", "osc"]
+VoiceRole = Literal["theme", "harmony", "ornament"]
+NoteGenerator = Literal["theme", "rule", "notochord"]
+CompositionMode = Literal["theme", "motif", "hybrid", "anchored", "generative"]
 
 
 class EmotionState(BaseModel):
@@ -87,6 +92,140 @@ class MusicEvent(BaseModel):
     args: list[Any] = Field(default_factory=list)
 
 
+class SegmentNote(BaseModel):
+    beat: float = Field(ge=0.0)
+    duration_beats: float = Field(gt=0.0)
+    pitch: int = Field(ge=0, le=127)
+    velocity: int = Field(ge=1, le=127)
+    track_id: str
+    channel: int = Field(ge=1, le=16)
+    voice_role: VoiceRole | None = None
+    generated_by: NoteGenerator = "rule"
+
+
+class MusicSegment(BaseModel):
+    id: str
+    emotion: EmotionLabel
+    previous_emotion: EmotionLabel
+    bpm: int = Field(ge=30, le=220)
+    bars: int = Field(default=4, ge=1, le=16)
+    beats_per_bar: int = Field(default=4, ge=1, le=12)
+    root_note: str = "C"
+    scale: str = "gong"
+    source: Literal["model", "rule", "theme", "motif", "hybrid"]
+    form_section: FormSection = "theme"
+    phrase_id: str = ""
+    theme_id: str = ""
+    motif_id: str = ""
+    motif_title: str = ""
+    portrait: EmotionLabel | None = None
+    theme_similarity: float = Field(default=0.0, ge=0.0, le=1.0)
+    harmony: list[str] = Field(default_factory=list)
+    transition_type: str = "continue"
+    from_emotion: EmotionLabel | None = None
+    to_emotion: EmotionLabel | None = None
+    transition_progress: float = Field(default=0.0, ge=0.0, le=1.0)
+    transition_strategy: str = ""
+    ornamented_beats: list[float] = Field(default_factory=list)
+    actual_max_voices: int = Field(default=1, ge=1, le=8)
+    harmony_note_count: int = Field(default=0, ge=0)
+    arpeggio_note_count: int = Field(default=0, ge=0)
+    notochord_modified_count: int = Field(default=0, ge=0)
+    generated_at: float = Field(default_factory=time.time)
+    generation_ms: float = Field(default=0.0, ge=0.0)
+    notes: list[SegmentNote] = Field(default_factory=list)
+
+    @property
+    def total_beats(self) -> int:
+        return self.bars * self.beats_per_bar
+
+    @property
+    def duration_seconds(self) -> float:
+        return self.total_beats * 60.0 / self.bpm
+
+
+class MusicParams(BaseModel):
+    tempo: int = Field(default=84, ge=30, le=220)
+    density: float = Field(default=0.5, ge=0.0, le=1.0)
+    velocity: float = Field(default=0.5, ge=0.0, le=1.0)
+    register: Literal["low", "mid", "mid_high", "high", "wide"] = "mid"
+    scale: str = "gong"
+    mode: str = "pentatonic"
+    instruments: dict[str, float] = Field(default_factory=dict)
+    reverb: float = Field(default=0.25, ge=0.0, le=1.0)
+    delay: float = Field(default=0.1, ge=0.0, le=1.0)
+    rhythm_complexity: float = Field(default=0.35, ge=0.0, le=1.0)
+    brightness: float = Field(default=0.5, ge=0.0, le=1.0)
+    tension: float = Field(default=0.1, ge=0.0, le=1.0)
+
+
+class ModeTargetState(BaseModel):
+    valence: float = Field(default=0.85, ge=0.0, le=1.0)
+    arousal: float = Field(default=0.65, ge=0.0, le=1.0)
+    tension: float = Field(default=0.2, ge=0.0, le=1.0)
+    agency: float = Field(default=0.8, ge=0.0, le=1.0)
+
+
+class EngagingStageConfig(BaseModel):
+    name: str
+    start: float = Field(ge=0.0)
+    end: float = Field(gt=0.0)
+
+
+class MirrorModeConfig(BaseModel):
+    smoothing: float = Field(default=0.25, ge=0.0, le=1.0)
+    emotion_mappings: dict[EmotionLabel, MusicParams] = Field(default_factory=dict)
+
+
+class EngagingModeConfig(BaseModel):
+    duration_sec: int = Field(default=240, ge=60, le=600)
+    smoothing: float = Field(default=0.18, ge=0.0, le=1.0)
+    target_state: ModeTargetState = Field(default_factory=ModeTargetState)
+    stages: list[EngagingStageConfig] = Field(default_factory=list)
+    initial_emotion_paths: dict[EmotionLabel, list[str]] = Field(default_factory=dict)
+
+
+class SystemModesConfig(BaseModel):
+    MIRROR: MirrorModeConfig = Field(default_factory=MirrorModeConfig)
+    ENGAGING: EngagingModeConfig = Field(default_factory=EngagingModeConfig)
+
+
+class MusicGeneratorConfig(BaseModel):
+    enabled: bool = False
+    window_seconds: float = Field(default=16.0, ge=4.0, le=120.0)
+    fast_window_seconds: float = Field(default=4.0, ge=1.0, le=30.0)
+    minimum_samples: int = Field(default=4, ge=1, le=120)
+    bars: int = Field(default=8, ge=1, le=16)
+    beats_per_bar: int = Field(default=4, ge=1, le=12)
+    candidate_count: int = Field(default=4, ge=1, le=16)
+    inference_timeout_seconds: float = Field(default=2.0, ge=0.1, le=30.0)
+    lookahead_beats: float = Field(default=4.0, ge=1.0, le=16.0)
+    max_bpm_step: int = Field(default=6, ge=1, le=30)
+    system_mode: SystemMode = "ENGAGING"
+    composition_mode: CompositionMode = "motif"
+    target_duration_seconds: int = Field(default=240, ge=60, le=600)
+    theme_id: str = "random"
+    theme_recognition: float = Field(default=0.65, ge=0.0, le=1.0)
+    generation_freedom: float = Field(default=0.35, ge=0.0, le=1.0)
+    fallback_strategy: Literal["rule_variation"] = "rule_variation"
+    model_provider: Literal["auto", "local", "notochord", "rule"] = "auto"
+    model_path: str = "models/music/latest.pt"
+    model_config_path: str = "models/music/model_config.json"
+    notochord_checkpoint: str = "~/Library/Application Support/Notochord/notochord-latest.ckpt"
+    notochord_device: Literal["cpu", "mps", "auto"] = "cpu"
+    notochord_instrument: int = Field(default=14, ge=1, le=128)
+    system_modes: SystemModesConfig = Field(default_factory=SystemModesConfig)
+    emotion_bpm: dict[EmotionLabel, int] = Field(
+        default_factory=lambda: {
+            "joy": 108,
+            "calm": 68,
+            "neutral": 84,
+            "tense": 120,
+            "sad": 60,
+        }
+    )
+
+
 class GlobalMusicConfig(BaseModel):
     model_config = ConfigDict(extra="allow")
 
@@ -122,6 +261,7 @@ class ActiveMusicConfig(BaseModel):
     emotion_profiles: dict[EmotionLabel, EmotionProfile]
     tracks: list[TrackConfig] = Field(alias="default_tracks")
     parameter_schema: dict[str, Any] = Field(default_factory=dict, alias="music_parameter_schema")
+    system_modes: SystemModesConfig = Field(default_factory=SystemModesConfig)
 
     model_config = ConfigDict(populate_by_name=True)
 

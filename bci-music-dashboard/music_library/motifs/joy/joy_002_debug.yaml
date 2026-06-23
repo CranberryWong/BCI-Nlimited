@@ -1,0 +1,126 @@
+id: joy_002_debug
+title: Ceremonial Mallet Radiance Debug
+source_type: lyria_generated
+emotion: joy
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 108
+pitch_range:
+- 33
+- 91
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: motif_debug
+  anchors: &id001
+  - 15.836
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 15.836
+mutable_beats:
+- 0.155
+- 0.314
+- 0.895
+- 1.127
+- 1.336
+- 1.477
+- 1.641
+- 1.873
+- 2.127
+- 2.359
+- 2.591
+- 2.868
+- 3.105
+- 3.336
+- 3.709
+- 4.614
+- 4.845
+- 5.1
+- 5.382
+- 5.705
+- 5.845
+- 6.145
+- 6.4
+- 6.841
+- 7.1
+- 7.636
+- 8.4
+- 8.564
+- 9.095
+- 9.332
+- 9.609
+- 10.095
+- 10.373
+- 10.582
+- 10.841
+- 11.118
+- 11.327
+- 11.586
+- 12.655
+- 13.186
+- 13.605
+- 14.395
+- 14.627
+- 15.095
+- 15.35
+- 15.627
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: vi
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - -2
+  - 2
+  octave_shift:
+  - -12
+  - 12
+  rhythm_expand: true
+  rhythm_compress: true
+  ornament: true
+  delete_mutable_notes: true
+  repeat_motif: true
+  arpeggiate: true
+  notochord_fill: true
+portrait_behavior:
+  rhythm_profile: buoyant
+  articulation: light_staccato
+  arpeggio_shape: upward_sparkle
+  harmony_color: bright_open
+  register_motion: rising
+  texture_density: high
+  transition_style: lift
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+quality:
+  approved: true
+  notes: temporary debug motif auto-clipped from longer melody; replace with human-approved
+    edit before production

@@ -34,6 +34,17 @@ class OscOutput:
         except OSError:
             return
 
+    def all_notes_off(self, tracks: list[TrackConfig]) -> None:
+        for track in tracks:
+            try:
+                ip, port = self._target(track)
+                self._client(ip, port).send_message(
+                    f"/music/track/{track.id}/control",
+                    ["all_notes_off", track.midi_channel],
+                )
+            except OSError:
+                continue
+
     def _client(self, ip: str, port: int) -> SimpleUDPClient:
         key = (ip, port)
         if key not in self._clients:

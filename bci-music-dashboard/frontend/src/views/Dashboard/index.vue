@@ -28,6 +28,16 @@
       @start-model="run(emotion.startModel)"
       @stop-model="run(emotion.stopModel)"
     />
+    <MusicGeneratorPanel
+      :status="emotion.generator"
+      @start="run(emotion.startMusicGenerator)"
+      @stop="run(emotion.stopMusicGenerator)"
+      @reload="run(emotion.reloadMusicModel)"
+      @select-theme="run(() => emotion.selectMusicTheme($event))"
+      @random-theme="run(emotion.randomMusicTheme)"
+      @update-settings="run(() => emotion.updateMusicGeneratorSettings($event))"
+      @set-mode="run(() => emotion.setMusicGeneratorMode($event))"
+    />
     <section class="lower">
       <TrackList :tracks="tracks.tracks" @edit="selected = $event" @toggle="run(() => tracks.patchTrack($event))" @duplicate="run(() => tracks.duplicate($event))" @remove="run(() => tracks.remove($event))" @add="run(() => tracks.add($event))" />
       <OutputPanel :tracks="tracks.tracks" :midi="outputs.midi" @test="run(() => outputs.test($event))" />
@@ -56,6 +66,7 @@ import { useTracksStore } from '../../stores/tracks';
 import { APP_VERSION } from '../../version';
 import EmotionMonitor from './EmotionMonitor.vue';
 import MusicConfigDrawer from './MusicConfigDrawer.vue';
+import MusicGeneratorPanel from './MusicGeneratorPanel.vue';
 import OutputPanel from './OutputPanel.vue';
 import SessionRecorder from './SessionRecorder.vue';
 import TrackEditor from './TrackEditor.vue';

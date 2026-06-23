@@ -199,6 +199,97 @@ backend/app/config/music_defaults.yaml
 
 两项设置都会随 `Save Preset` 保存。
 
+## 主题驱动的 EEG 音乐生成器
+
+信号采集和音乐播放使用两个独立时钟：
+
+- 模拟器、真实模型或 OSC 输入继续按原频率发送情绪信号。
+- 生成器统计最近 16 秒信号，只在八小节乐句边界决定情绪与结构变化。
+- 每秒 EEG 同时发送连续控制事件，驱动木琴表达、Pad 亮度、Bass 与鼓的强度。
+- 曲式依次经过 Intro、Theme、Variation、Development、Climax、Return 和 Coda。
+- 木琴演奏主题与确定性变奏，Pad/Bass 按逐小节和声路线编配，鼓和镲提示脉冲及边界。
+- 木琴 `Polyphony` 表示主题轨最大同时声部数，默认 3；强拍通常二音，高潮、长音和终止处最多三音，全部继续输出到同一 MIDI Channel 1。
+- Notochord 只重配少量规则和声或填充旋律空隙，不修改主题锚点、基础和声或终止音。
+- 模型缺失、超时或输出不合规时只取消装饰，主题和规则编曲不中断。
+
+Dashboard 中需要分别点击 `Start Simulator`（或启动真实模型）和
+`Start Generator`。生成器状态会显示当前主题、曲式阶段、乐句进度、主题辨识度、
+实际木琴声部数、规则和声音数、Notochord修饰数、下一乐句缓冲和回退次数。
+
+### 主题曲库
+
+主题存放在：
+
+```text
+music_library/themes/<theme_id>/
+  melody.mid
+  arrangement.yaml
+  LICENSE.md
+```
+
+`melody.mid` 是唯一的音符来源；`arrangement.yaml` 保存乐句、锚点、不可变音、
+逐小节和声、情绪变体和配器元数据。仓库内置自行录入的公版主题
+`ode_to_joy` 作为完整示例。新增主题时必须同时提交版权来源说明。
+
+生成式音频草图只能离线人工策展后放入 `music_library/generated/<emotion>/`；
+Lyria 和 Stable Audio 不参与现场运行，自动音频转 MIDI 结果不得未经校正直接入库。
+
+### 准备训练素材
+
+将已获许可并人工确认情绪的单旋律 4/4 MIDI 放入：
+
+```text
+training_data/joy
+training_data/calm
+training_data/neutral
+training_data/tense
+training_data/sad
+```
+
+安装本地训练依赖并执行：
+
+```bash
+cd bci-music-dashboard
+backend/.venv/bin/pip install -r backend/requirements-music.txt
+backend/.venv/bin/python scripts/music_training/validate_dataset.py
+backend/.venv/bin/python scripts/music_training/prepare_dataset.py
+backend/.venv/bin/python scripts/music_training/train_melody.py --epochs 20
+backend/.venv/bin/python scripts/music_training/evaluate_melody.py
+backend/.venv/bin/python scripts/music_training/export_model.py
+```
+
+模型会导出到 `models/music/latest.pt` 和
+`models/music/model_config.json`。重新点击 `Reload Music Model` 即可加载。
+M1 Pro 原生运行优先使用 PyTorch MPS；Docker 镜像不安装 PyTorch，因此默认使用规则模式。
+
+### 使用 Notochord 预训练模型
+
+Notochord 已作为可选装饰器接入主题生成器。正式运行时不要同时启动
+`notochord homunculus`，否则 Homunculus 和 Dashboard 会同时向 Logic 发送 MIDI。
+Dashboard 会直接加载 Notochord checkpoint；主题骨架、强拍锚点、和声、Bass、Pad、
+鼓和镲始终由本系统确定。
+
+安装到后端虚拟环境：
+
+```bash
+cd bci-music-dashboard
+uv pip install --python backend/.venv/bin/python -r backend/requirements-music.txt
+```
+
+先运行一次 `uvx notochord homunculus` 下载官方 checkpoint，然后退出 Homunculus。在
+`.env` 中配置：
+
+```env
+MUSIC_MODEL_PROVIDER=notochord
+NOTOCHORD_CHECKPOINT=~/Library/Application Support/Notochord/notochord-latest.ckpt
+NOTOCHORD_DEVICE=cpu
+NOTOCHORD_INSTRUMENT=14
+```
+
+`14` 是 General MIDI 的 Xylophone。重启后端后，Dashboard 的“装饰模型”应显示
+`ready:notochord:cpu`；点击 `Reload Music Model` 可在不重启后端的情况下重新加载
+checkpoint。如果依赖或 checkpoint 缺失，系统会显示加载错误并继续完整主题演奏。
+
 ## 输出与测试
 
 OSC 输出地址包括：
@@ -226,7 +317,7 @@ Session API：
 - `POST /api/sessions/start`
 - `POST /api/sessions/stop`
 - `GET /api/sessions`
-- `GET /api/sessions/{id}/download?format=mid|csv|emotion-jsonl|music-jsonl|config`
+- `GET /api/sessions/{id}/download?format=mid|csv|emotion-jsonl|music-jsonl|config|segments|generator-status|model-metadata|composition-metadata`
 
 每次停止录制后，会保存：
 
@@ -234,7 +325,8 @@ Session API：
 - 情绪时间线 JSONL；
 - Music Events 事件日志 JSONL；
 - 标准 MIDI 文件；
-- 当次使用的 `music_config_snapshot.yaml`。
+- 当次使用的 `music_config_snapshot.yaml`；
+- 主题、曲式、和声、主题相似度与 Notochord 装饰位置。
 
 这些文件能够还原实验输入、生成决策、MIDI 输出和当次音乐配置。
 

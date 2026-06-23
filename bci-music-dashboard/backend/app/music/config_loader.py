@@ -109,5 +109,6 @@ class MusicConfigStore:
             "emotion_profiles": raw.get("emotion_profiles", {}),
             "default_tracks": raw.get("default_tracks") or raw.get("tracks") or [],
             "music_parameter_schema": raw.get("music_parameter_schema") or raw.get("parameter_schema") or {},
+            "system_modes": raw.get("system_modes", {}),
         }
         return ActiveMusicConfig.model_validate(compact)

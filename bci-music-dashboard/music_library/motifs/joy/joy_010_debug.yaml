@@ -1,0 +1,126 @@
+id: joy_010_debug
+title: Joy Debug
+source_type: lyria_generated
+emotion: joy
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 108
+pitch_range:
+- 36
+- 83
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: motif_debug
+  anchors: &id001
+  - 15.782
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 15.782
+mutable_beats:
+- 0.236
+- 0.632
+- 1.141
+- 1.373
+- 1.677
+- 2.164
+- 2.791
+- 3.118
+- 3.627
+- 3.977
+- 4.35
+- 4.673
+- 4.905
+- 5.255
+- 5.718
+- 5.859
+- 6.182
+- 6.345
+- 6.623
+- 7.091
+- 7.718
+- 8.227
+- 8.368
+- 8.695
+- 9.086
+- 9.25
+- 9.645
+- 9.809
+- 10.227
+- 10.714
+- 11.086
+- 11.623
+- 12.132
+- 12.295
+- 12.668
+- 13.014
+- 13.155
+- 13.386
+- 13.664
+- 13.873
+- 14.268
+- 14.455
+- 14.641
+- 14.923
+- 15.318
+- 15.618
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: vi
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - -2
+  - 2
+  octave_shift:
+  - -12
+  - 12
+  rhythm_expand: true
+  rhythm_compress: true
+  ornament: true
+  delete_mutable_notes: true
+  repeat_motif: true
+  arpeggiate: true
+  notochord_fill: true
+portrait_behavior:
+  rhythm_profile: buoyant
+  articulation: light_staccato
+  arpeggio_shape: upward_sparkle
+  harmony_color: bright_open
+  register_motion: rising
+  texture_density: high
+  transition_style: lift
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+quality:
+  approved: true
+  notes: temporary debug motif auto-clipped from longer melody; replace with human-approved
+    edit before production

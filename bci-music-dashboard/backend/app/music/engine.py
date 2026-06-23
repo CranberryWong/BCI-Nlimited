@@ -97,6 +97,15 @@ class MusicEngine:
             self._dispatch(track, event)
         return events
 
+    def dispatch_event(self, event: MusicEvent) -> None:
+        track = next((item for item in self.config.tracks if item.id == event.track_id), None)
+        if track is not None:
+            self._dispatch(track, event)
+
+    def all_notes_off(self) -> None:
+        self.midi.all_notes_off()
+        self.osc.all_notes_off(self.config.tracks)
+
     def _dispatch(self, track: TrackConfig, event: MusicEvent) -> None:
         mode = self.config.global_settings.output_mode
         if mode == "mock":

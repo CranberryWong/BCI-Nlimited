@@ -11,6 +11,14 @@ docker-bundle/
 docker-bundle*.zip
 /bci-music-dashboard-windows-amd64.zip
 models/*.pkl
+models/music/*.pt
+models/music/checkpoints/*
+!models/music/checkpoints/.gitkeep
+generated_audio/
+training_data/*/*.mid
+training_data/*/*.midi
+training_data/processed/*
+!training_data/processed/.gitkeep
 !models/.gitkeep
 backend/data/sessions/*
 !backend/data/sessions/.gitkeep

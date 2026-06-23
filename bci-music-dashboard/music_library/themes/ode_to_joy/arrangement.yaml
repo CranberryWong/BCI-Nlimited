@@ -1,0 +1,75 @@
+id: ode_to_joy
+title: Ode to Joy
+license:
+  composition: public_domain
+  composer: Ludwig van Beethoven
+  source_work: Symphony No. 9, fourth movement
+  midi_source: self_transcribed_for_this_project
+meter: 4/4
+home_key: C
+mode: major
+immutable_beats: [0, 4, 8, 12, 14, 16, 20, 24, 28, 30]
+phrases:
+  - id: A
+    bars: [1, 4]
+    role: theme
+    anchors: [0, 4, 8, 12, 14]
+    cadence: half
+  - id: A2
+    bars: [5, 8]
+    role: theme
+    anchors: [16, 20, 24, 28, 30]
+    cadence: authentic
+harmony:
+  - bars: [1, 1]
+    chord: I
+  - bars: [2, 2]
+    chord: V
+  - bars: [3, 3]
+    chord: I
+  - bars: [4, 4]
+    chord: V
+  - bars: [5, 5]
+    chord: I
+  - bars: [6, 6]
+    chord: V
+  - bars: [7, 7]
+    chord: IV
+  - bars: [8, 8]
+    chord: I
+emotion_variants:
+  joy:
+    tempo: 108
+    ornamentation: 0.32
+    rhythmic_activity: 0.85
+    velocity_gain: 1.08
+    octave_shift: 0
+  calm:
+    tempo: 68
+    ornamentation: 0.08
+    rhythmic_activity: 0.35
+    velocity_gain: 0.72
+    octave_shift: 0
+  neutral:
+    tempo: 84
+    ornamentation: 0.15
+    rhythmic_activity: 0.55
+    velocity_gain: 0.88
+    octave_shift: 0
+  tense:
+    tempo: 120
+    ornamentation: 0.4
+    rhythmic_activity: 0.95
+    velocity_gain: 1.12
+    octave_shift: 0
+  sad:
+    tempo: 60
+    ornamentation: 0.06
+    rhythmic_activity: 0.28
+    velocity_gain: 0.66
+    octave_shift: -12
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion: kick_and_cymbal
