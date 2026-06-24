@@ -1,0 +1,132 @@
+id: sad_004_performance
+title: Fragile Fragments Performance
+source_type: lyria_performance
+emotion: sad
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: yu
+tempo_hint: 60
+pitch_range:
+- 44
+- 80
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 1.25
+  - 4.2
+  - 5.223
+  - 6.2
+  - 7.177
+  - 7.595
+  - 8.223
+  - 9.195
+  - 15.309
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 1.25
+- 4.2
+- 5.223
+- 6.2
+- 15.309
+mutable_beats:
+- 2.205
+- 2.227
+- 2.364
+- 3.205
+- 3.318
+- 4.227
+- 4.782
+- 5.245
+- 5.686
+- 6.223
+- 7.177
+- 7.177
+- 7.177
+- 7.291
+- 7.595
+- 8.223
+- 8.245
+- 9.195
+- 9.218
+- 10.195
+- 10.218
+- 10.218
+- 11.15
+- 11.173
+- 11.173
+- 11.195
+- 12.15
+- 12.15
+- 12.173
+- 12.568
+- 13.168
+- 13.195
+- 13.218
+- 14.236
+- 14.259
+- 14.259
+- 15.286
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: vi
+- bars:
+  - 2
+  - 2
+  chord: IV
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: V
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: sparse_breathing
+  articulation: soft_legato
+  arpeggio_shape: falling_fragments
+  harmony_color: minor_warm
+  register_motion: descending
+  texture_density: low
+  transition_style: warmth
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: sad_004.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

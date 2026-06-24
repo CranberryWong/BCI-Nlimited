@@ -44,6 +44,7 @@ class Motif:
     orchestration: dict[str, Any]
     license: dict[str, Any]
     quality: dict[str, Any]
+    performance: dict[str, Any]
     path: Path
 
     @property
@@ -65,6 +66,7 @@ class Motif:
             "approved": self.approved,
             "selectable": self.selectable,
             "source_type": self.source_type,
+            "performance": self.performance,
         }
 
 
@@ -136,6 +138,11 @@ class MotifLibrary:
         candidates = list(self.approved_by_emotion.get(emotion, []))
         if avoid_id and len(candidates) > 1:
             candidates = [motif for motif in candidates if motif.id != avoid_id]
+        performance_candidates = [
+            motif for motif in candidates if motif.performance.get("polyphonic_melody")
+        ]
+        if performance_candidates:
+            return random.choice(performance_candidates)
         if candidates:
             return random.choice(candidates)
         fallback = [
@@ -144,6 +151,11 @@ class MotifLibrary:
             for motif in motifs
             if motif.id != avoid_id
         ]
+        performance_fallback = [
+            motif for motif in fallback if motif.performance.get("polyphonic_melody")
+        ]
+        if performance_fallback:
+            return random.choice(performance_fallback)
         return random.choice(fallback) if fallback else None
 
     @classmethod
@@ -155,7 +167,11 @@ class MotifLibrary:
         midi_path = yaml_path.with_suffix(".mid")
         if not midi_path.exists():
             raise MotifValidationError(f"missing MIDI pair: {midi_path.name}")
-        notes, meter = read_single_melody_midi(midi_path)
+        performance = dict(data.get("performance", {}))
+        if performance.get("polyphonic_melody"):
+            notes, meter = read_motif_midi(midi_path, allow_overlaps=True)
+        else:
+            notes, meter = read_single_melody_midi(midi_path)
         if not notes:
             raise MotifValidationError("motif MIDI contains no notes")
         beats_per_bar = int(str(data.get("meter") or meter).split("/")[0])
@@ -201,16 +217,21 @@ class MotifLibrary:
             orchestration=dict(data.get("orchestration", {})),
             license=dict(data.get("license", {})),
             quality=dict(data.get("quality", {})),
+            performance=performance,
             path=yaml_path.parent,
         )
 
 
 def read_single_melody_midi(path: Path) -> tuple[list[MotifNote], str]:
+    return read_motif_midi(path, allow_overlaps=False)
+
+
+def read_motif_midi(path: Path, allow_overlaps: bool = False) -> tuple[list[MotifNote], str]:
     midi = mido.MidiFile(path)
     merged = mido.merge_tracks(midi.tracks)
     meter = "4/4"
     absolute = 0
-    active: dict[tuple[int, int], tuple[int, int]] = {}
+    active: dict[tuple[int, int], list[tuple[int, int]]] = {}
     notes: list[MotifNote] = []
     for message in merged:
         absolute += message.time
@@ -218,11 +239,15 @@ def read_single_melody_midi(path: Path) -> tuple[list[MotifNote], str]:
             meter = f"{message.numerator}/{message.denominator}"
         if message.type == "note_on" and message.velocity > 0 and not getattr(message, "is_meta", False):
             key = (message.channel, message.note)
-            if key in active:
+            if not allow_overlaps and key in active:
                 raise MotifValidationError(f"overlapping same pitch note: {path}")
-            active[key] = (absolute, message.velocity)
+            active.setdefault(key, []).append((absolute, message.velocity))
         elif message.type in {"note_off", "note_on"} and getattr(message, "note", None) is not None:
-            started = active.pop((message.channel, message.note), None)
+            key = (message.channel, message.note)
+            stack = active.get(key)
+            started = stack.pop(0) if stack else None
+            if stack == []:
+                active.pop(key, None)
             if started:
                 start_tick, velocity = started
                 notes.append(MotifNote(
@@ -234,9 +259,10 @@ def read_single_melody_midi(path: Path) -> tuple[list[MotifNote], str]:
     if active:
         raise MotifValidationError(f"unterminated notes in {path}")
     notes = sorted(notes, key=lambda note: (note.beat, note.pitch))
-    for previous, current in zip(notes, notes[1:]):
-        if current.beat < previous.beat + previous.duration_beats - 0.01:
-            raise MotifValidationError(f"motif MIDI must contain one non-overlapping melody: {path}")
+    if not allow_overlaps:
+        for previous, current in zip(notes, notes[1:]):
+            if current.beat < previous.beat + previous.duration_beats - 0.01:
+                raise MotifValidationError(f"motif MIDI must contain one non-overlapping melody: {path}")
     return notes, meter
 
 

@@ -1,0 +1,153 @@
+id: neutral_008_performance
+title: Organized Symmetry Performance
+source_type: lyria_performance
+emotion: neutral
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 84
+pitch_range:
+- 34
+- 74
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 3.409
+  - 6.755
+  - 14.423
+  - 15.705
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 3.409
+- 6.755
+- 14.423
+- 15.705
+mutable_beats:
+- 0.091
+- 0.227
+- 0.741
+- 0.786
+- 1.109
+- 1.459
+- 1.736
+- 2.086
+- 2.086
+- 2.086
+- 2.409
+- 2.736
+- 2.736
+- 3.432
+- 3.432
+- 3.736
+- 4.064
+- 4.064
+- 4.364
+- 4.432
+- 4.736
+- 5.059
+- 5.386
+- 5.409
+- 5.409
+- 5.409
+- 6.059
+- 6.082
+- 6.082
+- 6.732
+- 6.918
+- 7.918
+- 8.082
+- 8.245
+- 8.732
+- 8.755
+- 9.105
+- 9.591
+- 9.777
+- 10.032
+- 10.077
+- 10.1
+- 10.405
+- 10.727
+- 10.75
+- 11.4
+- 11.427
+- 11.732
+- 11.941
+- 12.218
+- 12.427
+- 12.727
+- 12.727
+- 12.75
+- 13.077
+- 13.423
+- 13.423
+- 14.077
+- 14.077
+- 14.1
+- 14.7
+- 14.773
+- 15.118
+- 15.423
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: regular
+  articulation: balanced
+  arpeggio_shape: simple_outline
+  harmony_color: stable
+  register_motion: centered
+  texture_density: medium
+  transition_style: plain
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: neutral_008.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

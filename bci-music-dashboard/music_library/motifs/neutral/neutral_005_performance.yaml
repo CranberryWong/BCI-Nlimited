@@ -1,0 +1,153 @@
+id: neutral_005_performance
+title: Even Portrait Performance
+source_type: lyria_performance
+emotion: neutral
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 84
+pitch_range:
+- 45
+- 78
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 0.527
+  - 2.086
+  - 5.105
+  - 6.173
+  - 8.059
+  - 8.105
+  - 9.15
+  - 11.055
+  - 15.518
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 0.527
+- 2.086
+- 5.105
+- 6.173
+- 15.518
+mutable_beats:
+- 0.136
+- 0.159
+- 0.645
+- 1.041
+- 1.295
+- 1.318
+- 1.318
+- 2.109
+- 2.714
+- 3.132
+- 3.177
+- 3.177
+- 3.2
+- 3.2
+- 3.55
+- 3.9
+- 4.268
+- 4.268
+- 4.268
+- 4.618
+- 5.014
+- 5.082
+- 5.314
+- 5.873
+- 6.568
+- 6.895
+- 7.245
+- 7.245
+- 7.618
+- 8.059
+- 8.105
+- 9.105
+- 9.127
+- 9.15
+- 9.15
+- 9.495
+- 10.286
+- 10.309
+- 10.636
+- 11.055
+- 11.055
+- 11.055
+- 12.195
+- 12.195
+- 12.218
+- 12.241
+- 12.518
+- 12.564
+- 13.309
+- 13.309
+- 13.309
+- 14.095
+- 14.095
+- 14.095
+- 15.145
+- 15.145
+- 15.191
+- 15.236
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: regular
+  articulation: balanced
+  arpeggio_shape: simple_outline
+  harmony_color: stable
+  register_motion: centered
+  texture_density: medium
+  transition_style: plain
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: neutral_005.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

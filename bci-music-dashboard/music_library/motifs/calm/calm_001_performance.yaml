@@ -1,0 +1,130 @@
+id: calm_001_performance
+title: Balanced Wood Echoes Performance
+source_type: lyria_performance
+emotion: calm
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 68
+pitch_range:
+- 43
+- 67
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 1.8
+  - 2.586
+  - 2.609
+  - 5.773
+  - 7.395
+  - 8.164
+  - 8.932
+  - 8.955
+  - 15.764
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 1.8
+- 2.586
+- 2.609
+- 5.773
+- 15.764
+mutable_beats:
+- 0.195
+- 0.195
+- 0.195
+- 0.659
+- 0.964
+- 0.964
+- 0.964
+- 0.964
+- 3.4
+- 3.8
+- 4.168
+- 4.168
+- 4.191
+- 4.959
+- 6.586
+- 6.609
+- 7.395
+- 7.395
+- 7.395
+- 8.164
+- 8.164
+- 8.932
+- 8.955
+- 9.768
+- 10.559
+- 11.368
+- 12.141
+- 12.164
+- 12.973
+- 12.973
+- 13.0
+- 13.741
+- 13.764
+- 14.159
+- 14.623
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: IV
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: V
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: breathing
+  articulation: soft_legato
+  arpeggio_shape: gentle_wave
+  harmony_color: open_warm
+  register_motion: floating
+  texture_density: low
+  transition_style: dissolve
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: calm_001.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

@@ -1,0 +1,178 @@
+id: joy_009_performance
+title: Joy Performance
+source_type: lyria_performance
+emotion: joy
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 108
+pitch_range:
+- 43
+- 91
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 0.391
+  - 1.436
+  - 3.459
+  - 6.314
+  - 7.759
+  - 8.686
+  - 9.755
+  - 9.918
+  - 15.727
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 0.391
+- 1.436
+- 3.459
+- 6.314
+- 15.727
+mutable_beats:
+- 0.95
+- 1.159
+- 1.182
+- 1.555
+- 1.577
+- 1.945
+- 2.227
+- 2.532
+- 2.555
+- 2.577
+- 2.786
+- 2.809
+- 3.132
+- 3.414
+- 3.436
+- 3.623
+- 3.855
+- 4.018
+- 4.041
+- 4.25
+- 4.436
+- 4.459
+- 4.459
+- 4.641
+- 4.641
+- 4.827
+- 4.827
+- 5.014
+- 5.2
+- 5.2
+- 5.2
+- 5.2
+- 5.341
+- 5.573
+- 5.573
+- 5.709
+- 5.736
+- 5.918
+- 5.918
+- 5.945
+- 6.082
+- 6.127
+- 6.291
+- 6.432
+- 6.432
+- 6.664
+- 6.827
+- 6.827
+- 7.014
+- 7.2
+- 7.245
+- 7.386
+- 7.386
+- 7.409
+- 7.55
+- 7.573
+- 7.759
+- 7.759
+- 7.918
+- 7.918
+- 8.291
+- 8.523
+- 8.523
+- 8.686
+- 8.709
+- 8.941
+- 9.105
+- 9.291
+- 9.755
+- 9.918
+- 10.032
+- 10.032
+- 13.936
+- 14.382
+- 14.382
+- 14.823
+- 14.845
+- 14.845
+- 14.845
+- 14.845
+- 15.286
+- 15.705
+- 15.705
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: vi
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: buoyant
+  articulation: light_staccato
+  arpeggio_shape: upward_sparkle
+  harmony_color: bright_open
+  register_motion: rising
+  texture_density: high
+  transition_style: lift
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: joy_009.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

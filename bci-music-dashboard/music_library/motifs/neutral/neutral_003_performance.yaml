@@ -1,0 +1,179 @@
+id: neutral_003_performance
+title: Daily Rhythm Performance
+source_type: lyria_performance
+emotion: neutral
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 84
+pitch_range:
+- 46
+- 85
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 4.068
+  - 4.091
+  - 5.555
+  - 15.873
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 4.068
+- 4.091
+- 5.555
+- 15.873
+mutable_beats:
+- 0.073
+- 0.073
+- 0.095
+- 0.214
+- 0.745
+- 0.745
+- 0.745
+- 1.418
+- 1.418
+- 1.418
+- 1.768
+- 1.791
+- 2.091
+- 2.441
+- 2.741
+- 2.741
+- 2.741
+- 3.114
+- 3.136
+- 3.373
+- 3.373
+- 3.395
+- 3.745
+- 5.205
+- 5.414
+- 6.764
+- 6.764
+- 7.132
+- 7.182
+- 7.391
+- 7.414
+- 7.414
+- 7.673
+- 7.832
+- 8.064
+- 8.086
+- 8.086
+- 8.345
+- 8.532
+- 8.764
+- 8.764
+- 8.764
+- 9.414
+- 9.436
+- 9.436
+- 9.645
+- 9.668
+- 10.086
+- 10.086
+- 10.341
+- 10.527
+- 10.714
+- 10.759
+- 10.759
+- 10.991
+- 11.014
+- 11.386
+- 11.414
+- 11.414
+- 11.668
+- 11.855
+- 12.086
+- 12.318
+- 12.318
+- 12.55
+- 12.759
+- 12.991
+- 12.991
+- 13.409
+- 13.409
+- 13.432
+- 13.432
+- 13.664
+- 13.664
+- 13.873
+- 14.082
+- 14.105
+- 14.105
+- 14.314
+- 14.732
+- 14.755
+- 14.755
+- 14.755
+- 14.986
+- 15.009
+- 15.218
+- 15.218
+- 15.409
+- 15.664
+- 15.85
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: regular
+  articulation: balanced
+  arpeggio_shape: simple_outline
+  harmony_color: stable
+  register_motion: centered
+  texture_density: medium
+  transition_style: plain
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: neutral_003.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

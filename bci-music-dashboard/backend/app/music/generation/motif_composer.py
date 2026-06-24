@@ -41,28 +41,31 @@ class MotifComposer:
         started = time.perf_counter()
         melody_track = self.arranger._required_track(tracks, "melody")
         melody = self._melody(motif, emotion, melody_track, freedom, transition)
-        voiced = self.voicing.apply(
-            melody,
-            list(motif.harmony),
-            motif.home_key,
-            motif.beats_per_bar,
-            position.section,
-            emotion,
-            melody_track,
-            motif.immutable_beats,
-        )
-        arpeggiated = self.arpeggio.apply(
-            melody,
-            voiced,
-            list(motif.harmony),
-            motif.home_key,
-            motif.mode,
-            motif.beats_per_bar,
-            position.section,
-            emotion,
-            melody_track,
-            motif.immutable_beats,
-        )
+        if motif.performance.get("preserve_polyphony"):
+            arpeggiated = melody
+        else:
+            voiced = self.voicing.apply(
+                melody,
+                list(motif.harmony),
+                motif.home_key,
+                motif.beats_per_bar,
+                position.section,
+                emotion,
+                melody_track,
+                motif.immutable_beats,
+            )
+            arpeggiated = self.arpeggio.apply(
+                melody,
+                voiced,
+                list(motif.harmony),
+                motif.home_key,
+                motif.mode,
+                motif.beats_per_bar,
+                position.section,
+                emotion,
+                melody_track,
+                motif.immutable_beats,
+            )
         notes = list(arpeggiated)
         pseudo = self._pseudo_theme(motif)
         pad = self.arranger._optional_track(tracks, "pad") or self.arranger._optional_track(tracks, "chord")
@@ -119,11 +122,14 @@ class MotifComposer:
         transition: TransitionPlan,
     ) -> list[SegmentNote]:
         allowed = motif.variation_allowed
+        preserve = bool(motif.performance.get("preserve_polyphony"))
         transpose_min, transpose_max = allowed.get("transpose", [-2, 2])
-        transpose = round((emotion.valence_norm - 0.5) * (transpose_max - transpose_min))
+        transpose = 0 if preserve else round((emotion.valence_norm - 0.5) * (transpose_max - transpose_min))
         octave_choices = allowed.get("octave_shift", [-12, 12])
         octave = 0
-        if emotion.label == "joy" and max(octave_choices) >= 12:
+        if preserve:
+            octave = 0
+        elif emotion.label == "joy" and max(octave_choices) >= 12:
             octave = 12
         elif emotion.label == "sad" and min(octave_choices) <= -12:
             octave = -12
@@ -136,12 +142,12 @@ class MotifComposer:
             beat = source.beat
             duration = source.duration_beats
             mutable = round(source.beat, 3) in motif.mutable_beats
-            if mutable and allowed.get("delete_mutable_notes", True):
+            if not preserve and mutable and allowed.get("delete_mutable_notes", True):
                 if ((index + round(freedom * 10)) * 31) % 100 > round(density * 100):
                     continue
-            if mutable and allowed.get("rhythm_compress", True) and emotion.arousal_norm > 0.65:
+            if not preserve and mutable and allowed.get("rhythm_compress", True) and emotion.arousal_norm > 0.65:
                 duration = max(0.25, duration * 0.72)
-            elif mutable and allowed.get("rhythm_expand", True) and emotion.label in {"calm", "sad"}:
+            elif not preserve and mutable and allowed.get("rhythm_expand", True) and emotion.label in {"calm", "sad"}:
                 duration *= 1.12
             pitch = self._fit_pitch(source.pitch + transpose + octave, track.pitch_range)
             velocity = round(source.velocity * (0.72 + emotion.arousal_norm * 0.4))
@@ -155,7 +161,7 @@ class MotifComposer:
                 track_id=track.id,
                 channel=track.midi_channel,
                 voice_role="theme",
-                generated_by="theme",
+                generated_by="rule" if preserve else "theme",
             ))
         return sorted(notes, key=lambda note: note.beat)
 

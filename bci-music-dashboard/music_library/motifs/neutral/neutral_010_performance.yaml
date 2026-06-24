@@ -1,0 +1,152 @@
+id: neutral_010_performance
+title: Xylophone Miniature Performance
+source_type: lyria_performance
+emotion: neutral
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 84
+pitch_range:
+- 39
+- 81
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 0.059
+  - 1.173
+  - 1.218
+  - 4.15
+  - 4.591
+  - 6.1
+  - 7.191
+  - 9.05
+  - 15.814
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 0.059
+- 1.173
+- 1.218
+- 4.15
+- 15.814
+mutable_beats:
+- 0.105
+- 0.386
+- 0.477
+- 0.85
+- 1.195
+- 1.614
+- 1.941
+- 2.314
+- 2.336
+- 2.659
+- 3.036
+- 3.059
+- 3.059
+- 3.45
+- 3.823
+- 4.127
+- 4.591
+- 5.332
+- 6.1
+- 6.1
+- 6.473
+- 6.823
+- 7.191
+- 7.191
+- 7.541
+- 7.936
+- 8.332
+- 8.332
+- 8.677
+- 9.05
+- 9.073
+- 9.145
+- 9.818
+- 9.818
+- 9.841
+- 10.582
+- 10.582
+- 10.605
+- 11.327
+- 12.073
+- 12.095
+- 12.468
+- 12.859
+- 13.209
+- 13.209
+- 13.373
+- 13.559
+- 13.905
+- 14.023
+- 14.323
+- 14.345
+- 14.65
+- 15.045
+- 15.045
+- 15.068
+- 15.418
+- 15.441
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: regular
+  articulation: balanced
+  arpeggio_shape: simple_outline
+  harmony_color: stable
+  register_motion: centered
+  texture_density: medium
+  transition_style: plain
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: neutral_010.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

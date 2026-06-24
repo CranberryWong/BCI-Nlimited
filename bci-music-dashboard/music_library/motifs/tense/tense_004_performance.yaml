@@ -1,0 +1,161 @@
+id: tense_004_performance
+title: Jagged Pulse Performance
+source_type: lyria_performance
+emotion: tense
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: jue
+tempo_hint: 120
+pitch_range:
+- 42
+- 85
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 6.005
+  - 13.814
+  - 15.695
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 6.005
+- 13.814
+- 15.695
+mutable_beats:
+- 0.014
+- 0.5
+- 0.964
+- 0.986
+- 1.455
+- 1.455
+- 1.941
+- 1.941
+- 2.427
+- 2.427
+- 2.873
+- 2.895
+- 2.964
+- 3.359
+- 3.359
+- 3.823
+- 3.845
+- 4.286
+- 4.309
+- 4.777
+- 4.914
+- 5.264
+- 5.286
+- 5.286
+- 5.682
+- 5.795
+- 6.214
+- 6.264
+- 6.264
+- 6.495
+- 6.705
+- 6.727
+- 6.959
+- 7.168
+- 7.427
+- 7.659
+- 7.868
+- 7.891
+- 8.123
+- 8.586
+- 8.609
+- 8.609
+- 8.609
+- 9.073
+- 9.073
+- 9.327
+- 9.564
+- 9.564
+- 9.818
+- 10.027
+- 10.05
+- 10.259
+- 10.514
+- 10.514
+- 10.514
+- 10.727
+- 10.959
+- 10.982
+- 11.191
+- 11.423
+- 11.423
+- 11.445
+- 11.655
+- 11.886
+- 11.932
+- 12.514
+- 12.859
+- 13.327
+- 13.441
+- 14.277
+- 14.3
+- 14.768
+- 15.232
+- 15.232
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: i
+- bars:
+  - 2
+  - 2
+  chord: bII
+- bars:
+  - 3
+  - 3
+  chord: V
+- bars:
+  - 4
+  - 4
+  chord: i
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: syncopated
+  articulation: short_accented
+  arpeggio_shape: jagged
+  harmony_color: controlled_tension
+  register_motion: wide
+  texture_density: high
+  transition_style: grounding
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: tense_004.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

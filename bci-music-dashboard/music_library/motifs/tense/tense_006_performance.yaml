@@ -1,0 +1,146 @@
+id: tense_006_performance
+title: Restless Portrait Performance
+source_type: lyria_performance
+emotion: tense
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: jue
+tempo_hint: 120
+pitch_range:
+- 56
+- 84
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 15.732
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 15.732
+mutable_beats:
+- 0.095
+- 0.327
+- 0.514
+- 0.836
+- 1.068
+- 1.327
+- 1.582
+- 1.741
+- 2.068
+- 2.345
+- 2.577
+- 2.836
+- 3.091
+- 3.323
+- 3.577
+- 3.577
+- 4.068
+- 4.3
+- 4.577
+- 4.577
+- 4.832
+- 5.068
+- 5.3
+- 5.6
+- 5.855
+- 6.086
+- 6.318
+- 6.6
+- 6.832
+- 7.086
+- 7.341
+- 7.595
+- 7.832
+- 8.064
+- 8.295
+- 8.527
+- 8.736
+- 9.086
+- 9.318
+- 9.827
+- 10.109
+- 10.341
+- 10.527
+- 10.759
+- 11.105
+- 11.268
+- 11.595
+- 11.827
+- 12.059
+- 12.245
+- 12.595
+- 12.827
+- 13.082
+- 13.336
+- 13.523
+- 13.85
+- 14.082
+- 14.336
+- 14.568
+- 14.823
+- 15.077
+- 15.309
+- 15.568
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: i
+- bars:
+  - 2
+  - 2
+  chord: bII
+- bars:
+  - 3
+  - 3
+  chord: V
+- bars:
+  - 4
+  - 4
+  chord: i
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: syncopated
+  articulation: short_accented
+  arpeggio_shape: jagged
+  harmony_color: controlled_tension
+  register_motion: wide
+  texture_density: high
+  transition_style: grounding
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: tense_006.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

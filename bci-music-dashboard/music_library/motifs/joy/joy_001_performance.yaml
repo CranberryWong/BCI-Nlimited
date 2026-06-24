@@ -1,0 +1,251 @@
+id: joy_001_performance
+title: Joy Performance
+source_type: lyria_performance
+emotion: joy
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 108
+pitch_range:
+- 34
+- 89
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 0.959
+  - 2.005
+  - 4.332
+  - 5.632
+  - 7.395
+  - 7.514
+  - 7.836
+  - 10.65
+  - 15.714
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 0.959
+- 2.005
+- 4.332
+- 5.632
+- 15.714
+mutable_beats:
+- 0.055
+- 0.1
+- 0.145
+- 0.427
+- 0.427
+- 0.45
+- 0.45
+- 0.659
+- 0.773
+- 0.823
+- 0.982
+- 0.982
+- 1.005
+- 1.032
+- 1.309
+- 1.45
+- 1.632
+- 1.632
+- 1.655
+- 1.682
+- 1.795
+- 2.027
+- 2.027
+- 2.027
+- 2.377
+- 2.377
+- 2.4
+- 2.7
+- 2.795
+- 2.959
+- 3.168
+- 3.214
+- 3.236
+- 3.332
+- 3.564
+- 3.564
+- 3.586
+- 3.914
+- 3.936
+- 3.936
+- 3.959
+- 4.7
+- 4.723
+- 4.745
+- 4.773
+- 4.909
+- 5.118
+- 5.118
+- 5.141
+- 5.141
+- 5.514
+- 5.655
+- 5.677
+- 5.932
+- 6.259
+- 6.282
+- 6.282
+- 6.282
+- 6.282
+- 6.327
+- 6.65
+- 6.7
+- 7.068
+- 7.068
+- 7.068
+- 7.236
+- 7.282
+- 7.327
+- 7.373
+- 7.395
+- 7.514
+- 7.677
+- 7.836
+- 7.864
+- 7.864
+- 8.045
+- 8.073
+- 8.186
+- 8.186
+- 8.232
+- 8.232
+- 8.255
+- 8.605
+- 8.695
+- 8.723
+- 8.977
+- 9.114
+- 9.418
+- 9.418
+- 9.441
+- 9.509
+- 9.532
+- 9.741
+- 9.764
+- 9.764
+- 9.791
+- 9.791
+- 9.859
+- 10.182
+- 10.182
+- 10.182
+- 10.232
+- 10.323
+- 10.577
+- 10.577
+- 10.577
+- 10.65
+- 11.041
+- 11.068
+- 11.091
+- 11.114
+- 11.368
+- 11.368
+- 11.368
+- 11.673
+- 11.741
+- 11.741
+- 11.882
+- 11.905
+- 12.023
+- 12.023
+- 12.136
+- 12.509
+- 12.509
+- 12.509
+- 12.673
+- 12.882
+- 12.927
+- 12.927
+- 13.227
+- 13.273
+- 13.295
+- 13.295
+- 13.482
+- 13.505
+- 13.6
+- 13.714
+- 13.714
+- 13.741
+- 13.877
+- 14.041
+- 14.064
+- 14.064
+- 14.086
+- 14.436
+- 14.459
+- 14.482
+- 14.482
+- 14.855
+- 14.855
+- 14.877
+- 14.877
+- 15.414
+- 15.414
+- 15.623
+- 15.623
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: vi
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: buoyant
+  articulation: light_staccato
+  arpeggio_shape: upward_sparkle
+  harmony_color: bright_open
+  register_motion: rising
+  texture_density: high
+  transition_style: lift
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: joy_001.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

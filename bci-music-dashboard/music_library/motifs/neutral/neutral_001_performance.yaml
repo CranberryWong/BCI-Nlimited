@@ -1,0 +1,155 @@
+id: neutral_001_performance
+title: Balanced Minimalist Performance
+source_type: lyria_performance
+emotion: neutral
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 84
+pitch_range:
+- 45
+- 84
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 0.805
+  - 1.573
+  - 5.314
+  - 5.686
+  - 8.705
+  - 11.332
+  - 13.564
+  - 13.586
+  - 15.841
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 0.805
+- 1.573
+- 5.314
+- 5.686
+- 15.841
+mutable_beats:
+- 0.064
+- 1.155
+- 2.318
+- 2.318
+- 2.709
+- 3.082
+- 3.409
+- 3.432
+- 3.805
+- 3.805
+- 3.805
+- 3.805
+- 4.155
+- 4.177
+- 4.55
+- 4.55
+- 4.573
+- 4.918
+- 4.918
+- 5.291
+- 6.059
+- 6.823
+- 6.823
+- 6.823
+- 7.545
+- 7.545
+- 8.314
+- 8.314
+- 8.314
+- 8.705
+- 8.705
+- 9.077
+- 9.077
+- 9.823
+- 9.845
+- 9.845
+- 10.168
+- 10.564
+- 10.586
+- 10.586
+- 10.936
+- 10.936
+- 11.309
+- 11.332
+- 11.355
+- 11.355
+- 12.055
+- 12.818
+- 12.818
+- 12.841
+- 13.168
+- 13.564
+- 13.586
+- 13.982
+- 14.35
+- 14.723
+- 15.118
+- 15.118
+- 15.445
+- 15.468
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: regular
+  articulation: balanced
+  arpeggio_shape: simple_outline
+  harmony_color: stable
+  register_motion: centered
+  texture_density: medium
+  transition_style: plain
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: neutral_001.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

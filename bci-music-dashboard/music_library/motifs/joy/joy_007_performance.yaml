@@ -1,0 +1,171 @@
+id: joy_007_performance
+title: Joy Performance
+source_type: lyria_performance
+emotion: joy
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 108
+pitch_range:
+- 57
+- 86
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 8.0
+  - 15.482
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 8.0
+- 15.482
+mutable_beats:
+- 0.032
+- 0.241
+- 0.45
+- 0.659
+- 0.868
+- 1.077
+- 1.077
+- 1.309
+- 1.727
+- 1.75
+- 1.936
+- 2.168
+- 2.168
+- 2.168
+- 3.05
+- 3.073
+- 3.445
+- 3.445
+- 3.864
+- 4.305
+- 4.332
+- 4.355
+- 4.773
+- 4.982
+- 5.191
+- 5.632
+- 5.632
+- 5.632
+- 5.632
+- 6.073
+- 6.282
+- 6.7
+- 6.909
+- 7.118
+- 7.118
+- 7.305
+- 7.305
+- 7.745
+- 7.745
+- 8.186
+- 8.373
+- 8.627
+- 8.627
+- 9.068
+- 9.509
+- 9.509
+- 9.927
+- 9.95
+- 10.323
+- 10.368
+- 10.368
+- 10.786
+- 10.786
+- 10.995
+- 11.186
+- 11.209
+- 11.345
+- 11.627
+- 11.627
+- 11.65
+- 11.65
+- 12.068
+- 12.068
+- 12.068
+- 12.486
+- 12.486
+- 12.486
+- 12.927
+- 12.927
+- 13.136
+- 13.368
+- 13.368
+- 13.555
+- 13.786
+- 13.786
+- 13.786
+- 14.205
+- 14.227
+- 14.227
+- 14.227
+- 14.668
+- 14.877
+- 14.877
+- 14.877
+- 15.064
+- 15.227
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: V
+- bars:
+  - 3
+  - 3
+  chord: vi
+- bars:
+  - 4
+  - 4
+  chord: IV
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: buoyant
+  articulation: light_staccato
+  arpeggio_shape: upward_sparkle
+  harmony_color: bright_open
+  register_motion: rising
+  texture_density: high
+  transition_style: lift
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: light_pulse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: joy_007.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

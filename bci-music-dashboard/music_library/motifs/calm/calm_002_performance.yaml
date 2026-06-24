@@ -1,0 +1,178 @@
+id: calm_002_performance
+title: Floating Wood Melodies Performance
+source_type: lyria_performance
+emotion: calm
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 68
+pitch_range:
+- 62
+- 87
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 1.209
+  - 2.718
+  - 3.764
+  - 4.6
+  - 7.2
+  - 10.873
+  - 14.082
+  - 14.941
+  - 15.777
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 1.209
+- 2.718
+- 3.764
+- 4.6
+- 15.777
+mutable_beats:
+- 0.35
+- 0.35
+- 0.35
+- 0.768
+- 1.0
+- 1.418
+- 1.605
+- 1.791
+- 2.068
+- 2.068
+- 2.068
+- 2.509
+- 2.6
+- 2.905
+- 2.927
+- 3.345
+- 3.532
+- 4.182
+- 4.414
+- 4.832
+- 4.832
+- 5.041
+- 5.459
+- 5.459
+- 5.691
+- 5.9
+- 5.9
+- 6.132
+- 6.132
+- 6.341
+- 6.341
+- 6.341
+- 6.577
+- 6.577
+- 6.759
+- 6.759
+- 6.991
+- 7.2
+- 7.227
+- 7.227
+- 7.436
+- 7.6
+- 7.6
+- 7.809
+- 8.041
+- 8.041
+- 8.25
+- 8.273
+- 8.459
+- 8.459
+- 8.668
+- 8.9
+- 8.9
+- 9.132
+- 9.341
+- 9.573
+- 10.014
+- 10.223
+- 10.432
+- 10.641
+- 10.641
+- 10.641
+- 10.873
+- 11.082
+- 11.291
+- 11.482
+- 11.505
+- 11.714
+- 11.923
+- 11.923
+- 12.082
+- 12.364
+- 12.364
+- 12.805
+- 12.805
+- 13.245
+- 13.641
+- 13.664
+- 14.082
+- 14.082
+- 14.5
+- 14.941
+- 15.359
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: IV
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: V
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: breathing
+  articulation: soft_legato
+  arpeggio_shape: gentle_wave
+  harmony_color: open_warm
+  register_motion: floating
+  texture_density: low
+  transition_style: dissolve
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: calm_002.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

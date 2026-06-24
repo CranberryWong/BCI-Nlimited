@@ -1,0 +1,179 @@
+id: calm_008_performance
+title: Reflective Wood Portrait Performance
+source_type: lyria_performance
+emotion: calm
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: gong
+tempo_hint: 68
+pitch_range:
+- 43
+- 77
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 0.6
+  - 0.645
+  - 1.018
+  - 2.177
+  - 2.55
+  - 4.132
+  - 4.595
+  - 4.895
+  - 15.795
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 0.6
+- 0.645
+- 1.018
+- 2.177
+- 15.795
+mutable_beats:
+- 1.364
+- 1.759
+- 1.805
+- 2.2
+- 2.2
+- 2.55
+- 2.573
+- 2.968
+- 3.127
+- 3.314
+- 3.336
+- 3.336
+- 3.732
+- 3.805
+- 4.014
+- 4.132
+- 4.155
+- 4.573
+- 4.595
+- 4.595
+- 4.895
+- 5.014
+- 5.336
+- 5.477
+- 5.755
+- 6.15
+- 6.218
+- 6.545
+- 7.009
+- 7.055
+- 7.382
+- 7.405
+- 7.777
+- 8.173
+- 8.195
+- 8.195
+- 8.568
+- 8.568
+- 8.591
+- 8.614
+- 8.636
+- 8.986
+- 9.359
+- 9.382
+- 9.45
+- 9.727
+- 9.777
+- 9.777
+- 10.145
+- 10.168
+- 10.191
+- 10.332
+- 10.659
+- 10.914
+- 10.959
+- 11.4
+- 11.4
+- 11.4
+- 11.423
+- 11.773
+- 11.773
+- 11.8
+- 12.009
+- 12.123
+- 12.586
+- 12.982
+- 13.4
+- 13.423
+- 13.423
+- 13.491
+- 13.541
+- 14.214
+- 14.214
+- 14.236
+- 14.259
+- 14.609
+- 14.632
+- 14.632
+- 14.977
+- 15.0
+- 15.027
+- 15.373
+- 15.395
+- 15.773
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: I
+- bars:
+  - 2
+  - 2
+  chord: IV
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: V
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: breathing
+  articulation: soft_legato
+  arpeggio_shape: gentle_wave
+  harmony_color: open_warm
+  register_motion: floating
+  texture_density: low
+  transition_style: dissolve
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: calm_008.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging

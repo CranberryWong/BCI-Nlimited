@@ -35,6 +35,14 @@ short motifs:
 python scripts/music_library/approve_debug_motifs.py --bars 4 --overwrite
 ```
 
+If the extracted single-line melody sounds too thin, create approved polyphonic
+performance motifs from the original raw MIDI. These keep the source chord/
+multi-note texture on the melody channel and are preferred by runtime selection:
+
+```bash
+python scripts/music_library/approve_performance_motifs.py music_library/motifs/joy --emotion joy --bars 4 --overwrite
+```
+
 Validate the library:
 
 ```bash

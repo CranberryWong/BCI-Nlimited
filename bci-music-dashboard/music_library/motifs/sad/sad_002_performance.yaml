@@ -1,0 +1,110 @@
+id: sad_002_performance
+title: Delayed Departure Performance
+source_type: lyria_performance
+emotion: sad
+license:
+  composition: generated_or_self_curated
+  model: Google Lyria
+  generated_date: TODO
+  midi_source: manually_transcribed_or_corrected
+  editor: TODO
+meter: 4/4
+bars: 4
+home_key: C
+mode: yu
+tempo_hint: 60
+pitch_range:
+- 67
+- 79
+phrases:
+- id: A
+  bars:
+  - 1
+  - 4
+  role: performance_motif
+  anchors: &id001
+  - 3.259
+  - 4.123
+  - 6.232
+  - 10.905
+  - 12.182
+  - 13.205
+  - 14.159
+  - 15.132
+  cadence: open
+anchors: *id001
+immutable_beats:
+- 3.259
+- 4.123
+- 6.232
+- 10.905
+- 15.132
+mutable_beats:
+- 0.218
+- 1.009
+- 1.795
+- 2.168
+- 2.541
+- 2.886
+- 6.35
+- 6.677
+- 8.232
+- 8.977
+- 9.373
+- 9.718
+- 10.159
+- 12.182
+- 13.205
+- 14.159
+harmony:
+- bars:
+  - 1
+  - 1
+  chord: vi
+- bars:
+  - 2
+  - 2
+  chord: IV
+- bars:
+  - 3
+  - 3
+  chord: I
+- bars:
+  - 4
+  - 4
+  chord: V
+variation_allowed:
+  transpose:
+  - 0
+  - 0
+  octave_shift:
+  - 0
+  - 0
+  rhythm_expand: false
+  rhythm_compress: false
+  ornament: false
+  delete_mutable_notes: false
+  repeat_motif: true
+  arpeggiate: false
+  notochord_fill: false
+portrait_behavior:
+  rhythm_profile: sparse_breathing
+  articulation: soft_legato
+  arpeggio_shape: falling_fragments
+  harmony_color: minor_warm
+  register_motion: descending
+  texture_density: low
+  transition_style: warmth
+orchestration:
+  melody: xylophone
+  harmony: pad
+  bass: synth_bass
+  percussion_profile: sparse
+  cymbal_profile: phrase_boundary_only
+performance:
+  polyphonic_melody: true
+  preserve_polyphony: true
+  source_midi: sad_002.mid
+quality:
+  approved: true
+  notes: temporary performance motif clipped from original polyphonic MIDI for debugging
