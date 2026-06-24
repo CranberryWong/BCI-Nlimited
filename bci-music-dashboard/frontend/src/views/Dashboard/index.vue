@@ -5,7 +5,7 @@
         <img src="/sign01.svg" alt="和鸣 Logo" />
         <div>
           <h1>和鸣-BCI Dashboard</h1>
-          <p style="margin-top: -5px;">Powered by 雷士德神经共振技术小组 | Version {{ APP_VERSION }}</p>
+          <p style="margin-top: -5px;">Powered by 雷士德神经共振技术小组 | 新技实验室 | 人机共协研究所 | Version {{ APP_VERSION }}</p>
         </div>
       </div>
       <div class="top-actions">
