@@ -1,4 +1,4 @@
-import type { EmotionState, MusicEvent, MusicGeneratorStatus, MusicSegment } from '../types';
+import type { EmotionState, MusicEvent, MusicGeneratorStatus, MusicSegment, NotoTestingStatus, PresetsTestingStatus } from '../types';
 
 export type RealtimeMessage =
   | { kind: 'status'; status: Record<string, unknown> }
@@ -7,7 +7,11 @@ export type RealtimeMessage =
   | { kind: 'segment_generated' | 'segment_started'; segment: MusicSegment; status: MusicGeneratorStatus }
   | { kind: 'phrase_started'; phrase_id: string; form_section: string; segment: MusicSegment; status: MusicGeneratorStatus }
   | { kind: 'form_section_changed' | 'harmony_changed' | 'theme_quoted' | 'climax_changed' | 'experience_completed' | 'mode_changed' | 'engaging_stage_changed' | 'music_params_changed'; status: MusicGeneratorStatus; [key: string]: unknown }
-  | { kind: 'generator_status'; status: MusicGeneratorStatus };
+  | { kind: 'generator_status'; status: MusicGeneratorStatus }
+  | { kind: 'presets_testing_segment_started'; segment: MusicSegment; presets_testing: PresetsTestingStatus }
+  | { kind: 'noto_testing_initial_started'; segment: MusicSegment; noto_testing: NotoTestingStatus }
+  | { kind: 'noto_testing_segment_started'; segment: MusicSegment; noto_testing: NotoTestingStatus }
+  | { kind: 'noto_testing_error'; noto_testing: NotoTestingStatus };
 
 export function openRealtime(onMessage: (message: RealtimeMessage) => void) {
   const scheme = location.protocol === 'https:' ? 'wss' : 'ws';

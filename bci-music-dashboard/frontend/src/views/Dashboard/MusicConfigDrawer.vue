@@ -37,16 +37,12 @@
           <n-tab-pane name="yaml" tab="YAML / Preset">
             <div class="toolbar-gap">
               <n-input v-model:value="presetName" placeholder="Preset name" />
-              <n-button @click="savePreset">Save Preset</n-button>
-              <n-button @click="exportYaml">Export YAML</n-button>
-              <n-upload :show-file-list="false" accept=".yaml,.yml,.json" :custom-request="importConfig">
-                <n-button>Import</n-button>
-              </n-upload>
+              <n-button type="primary" @click="savePreset">Save Preset</n-button>
+              <n-button @click="openPresetFolder">Open Config Folder</n-button>
             </div>
             <div class="preset-section">
               <div class="preset-heading">
                 <strong>Presets</strong>
-                <span>{{ selectedPreset ? 'Current preset selected' : 'No preset selected' }}</span>
               </div>
               <n-radio-group
                 :value="selectedPreset"
@@ -61,9 +57,14 @@
                 >
                   <n-radio :value="preset.id" />
                   <span class="preset-name">{{ preset.name }}</span>
-                  <n-tag v-if="preset.builtin" size="small" :bordered="false">Built-in</n-tag>
-                  <n-tag v-else size="small" type="success" :bordered="false">Custom</n-tag>
-                  <span v-if="preset.id === selectedPreset" class="current-label">Current</span>
+                  <n-tag
+                    class="preset-type-tag"
+                    :class="{ 'current-preset-tag': preset.id === selectedPreset }"
+                    size="small"
+                    :bordered="false"
+                  >
+                    {{ preset.builtin ? 'Built-in' : 'Custom' }}
+                  </n-tag>
                 </label>
               </n-radio-group>
             </div>
@@ -81,9 +82,9 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NCollapse, NCollapseItem, NDrawer, NDrawerContent, NFormItem, NInput, NInputNumber, NRadio, NRadioGroup, NSelect, NSlider, NTabPane, NTag, NTabs, NUpload, type UploadCustomRequestOptions } from 'naive-ui';
-import { defineComponent, h, onMounted, reactive, ref, watch } from 'vue';
-import { api, downloadConfig } from '../../api/client';
+import { NButton, NCollapse, NCollapseItem, NDrawer, NDrawerContent, NFormItem, NInput, NInputNumber, NRadio, NRadioGroup, NSelect, NSlider, NTabPane, NTag, NTabs } from 'naive-ui';
+import { defineComponent, h, reactive, ref, watch } from 'vue';
+import { api } from '../../api/client';
 import type { EmotionProfile, MusicConfig } from '../../types';
 
 const props = defineProps<{ show: boolean; config: MusicConfig | null }>();
@@ -122,29 +123,30 @@ function bounds(field: string) {
 async function loadPresets() {
   presets.value = (await api.get('/presets')).data;
   selectedPreset.value = presets.value.find((preset) => preset.active)?.id ?? null;
+  syncPresetName();
+}
+function syncPresetName() {
+  presetName.value = presets.value.find((preset) => preset.id === selectedPreset.value)?.name ?? '';
 }
 async function savePreset() {
-  const saved = (await api.post('/presets', { name: presetName.value || 'Dashboard Preset' })).data;
+  const saved = (await api.post('/presets', { name: presetName.value.trim() || 'Dashboard Preset' })).data;
   await loadPresets();
   selectedPreset.value = saved.id;
-  presetName.value = '';
+  presetName.value = saved.name;
 }
 async function loadPreset(id: string) {
   const config = (await api.post(`/presets/${id}/load`)).data;
   selectedPreset.value = id;
   presets.value = presets.value.map((preset) => ({ ...preset, active: preset.id === id }));
+  syncPresetName();
   emit('loaded', config);
 }
-async function importConfig(options: UploadCustomRequestOptions) {
-  const form = new FormData();
-  form.append('file', options.file.file as File);
-  emit('loaded', (await api.post('/music/config/import', form)).data);
-  options.onFinish();
+async function openPresetFolder() {
+  await api.post('/presets/open-folder');
 }
-function exportYaml() {
-  downloadConfig();
-}
-onMounted(loadPresets);
+watch(() => props.show, (show) => {
+  if (show) void loadPresets();
+}, { immediate: true });
 
 const RangeInput = defineComponent({
   props: { modelValue: Array<number>, label: String },
@@ -199,11 +201,6 @@ const ProfileScalar = defineComponent({
   margin-bottom: 10px;
 }
 
-.preset-heading span {
-  color: #5f6872;
-  font-size: 12px;
-}
-
 .preset-list {
   display: grid;
   border: 1px solid #d9dde3;
@@ -237,9 +234,8 @@ const ProfileScalar = defineComponent({
   white-space: nowrap;
 }
 
-.current-label {
-  color: #111;
-  font-size: 12px;
-  font-weight: 600;
+:deep(.current-preset-tag) {
+  background: #000 !important;
+  color: #fff !important;
 }
 </style>

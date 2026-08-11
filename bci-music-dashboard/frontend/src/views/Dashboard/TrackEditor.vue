@@ -96,6 +96,41 @@
           </n-radio-group>
           <n-input-number v-if="draft.bpm !== 'auto'" v-model:value="manualBpm" :min="schema.bpm?.min ?? 30" :max="schema.bpm?.max ?? 220" @update:value="draft.bpm = $event ?? 96" />
         </n-form-item>
+        <h4>Notochord Assist</h4>
+        <n-form-item label="Enable Notochord Assist">
+          <n-switch
+            :value="Boolean(draft.notochord_enabled)"
+            @update:value="draft.notochord_enabled = $event"
+          />
+        </n-form-item>
+        <template v-if="draft.notochord_enabled">
+          <div class="two">
+            <n-form-item label="Assist Mode">
+              <n-select
+                :value="draft.notochord_mode ?? 'revoice'"
+                :options="notochordModeOptions"
+                @update:value="draft.notochord_mode = $event"
+              />
+            </n-form-item>
+            <n-form-item label="Model Instrument ID">
+              <n-input-number
+                :value="draft.notochord_instrument ?? null"
+                :min="schema.notochord_instrument?.min ?? 0"
+                :max="schema.notochord_instrument?.max ?? 255"
+                clearable
+                @update:value="draft.notochord_instrument = $event"
+              />
+            </n-form-item>
+          </div>
+          <scalar-row
+            label="Assist Rate"
+            :model-value="extraNumber('notochord_rate', 0.25)"
+            :min="schema.notochord_rate?.min ?? 0"
+            :max="schema.notochord_rate?.max ?? 1"
+            :step="0.05"
+            @update:model-value="draft.notochord_rate = $event"
+          />
+        </template>
         <h4>Mapping Weights</h4>
         <scalar-row v-for="(_, key) in draft.mapping" :key="key" :label="String(key)" v-model="draft.mapping[key]" :min="schema.mapping_weight?.min ?? -1" :max="schema.mapping_weight?.max ?? 1" :step="0.01" />
         <template v-if="draft.role === 'drum'">
@@ -164,6 +199,11 @@ const outputOptions = ['osc', 'midi'].map((value) => ({ label: value.toUpperCase
 const rootOptions = ['auto', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].map((value) => ({ label: value, value }));
 const scaleOptions = ['auto', 'major', 'minor', 'pentatonic', 'chromatic', 'dorian', 'lydian', 'phrygian', 'gong', 'shang', 'jue', 'zhi', 'yu'].map((value) => ({ label: value, value }));
 const arpeggioRateOptions = ['1/8', '1/16'].map((value) => ({ label: value, value }));
+const notochordModeOptions = [
+  { label: 'Revoice eligible notes', value: 'revoice' },
+  { label: 'Fill reserved slots', value: 'fill' },
+  { label: 'Off', value: 'off' },
+];
 
 const ScalarRow = defineComponent({
   props: { modelValue: Number, label: String, min: Number, max: Number, step: Number },

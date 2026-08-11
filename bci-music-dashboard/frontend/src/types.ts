@@ -1,7 +1,7 @@
 export type EmotionLabel = 'joy' | 'calm' | 'neutral' | 'tense' | 'sad';
 export type TrackRole = 'melody' | 'chord' | 'bass' | 'drum' | 'cymbal' | 'pad' | 'fx';
 export type SystemMode = 'MIRROR' | 'ENGAGING';
-export type CompositionMode = 'theme' | 'motif' | 'hybrid' | 'anchored' | 'generative';
+export type CompositionMode = 'theme' | 'motif' | 'hybrid' | 'anchored' | 'generative' | 'portrait';
 
 export interface EmotionState {
   valence_class: number;
@@ -35,7 +35,7 @@ export interface MusicSegment {
   bpm: number;
   bars: number;
   beats_per_bar: number;
-  source: 'model' | 'rule' | 'theme' | 'motif' | 'hybrid';
+  source: 'model' | 'rule' | 'theme' | 'motif' | 'portrait' | 'hybrid';
   form_section: 'intro' | 'theme' | 'variation' | 'development' | 'climax' | 'return' | 'coda';
   phrase_id: string;
   theme_id: string;
@@ -89,6 +89,31 @@ export interface MusicGeneratorStatus {
   mode: CompositionMode;
   system_mode: SystemMode;
   composition_mode: CompositionMode;
+  current_portrait_asset_id?: string;
+  current_portrait_asset_title?: string;
+  portrait_role?: 'loop' | 'tension' | 'release' | 'sketch' | '';
+  portrait_harmony_enabled?: boolean;
+  portrait_harmony_arpeggio_enabled?: boolean;
+  notochord_tracks?: Record<string, { enabled: boolean; mode: string; available: boolean }>;
+  notochord_track_counts?: Record<string, number>;
+  base_bpm?: number;
+  effective_bpm?: number;
+  next_target_bpm?: number | null;
+  bass_note_count?: number;
+  drum_note_count?: number;
+  cymbal_note_count?: number;
+  current_harmony?: string;
+  current_harmony_index?: number | null;
+  harmony_progression?: string[];
+  available_portrait_assets?: Array<{ id: string; title: string; emotion: string; role: string; meter: string; bars: number; bpm: number }>;
+  portrait_library_errors?: string[];
+  xylophone_same_key_minimum_interval_seconds?: number;
+  xylophone_suppressed_count?: number;
+  initial_emotion_ready?: boolean;
+  required_initial_samples?: number;
+  active_portrait_emotion?: EmotionLabel | null;
+  pending_portrait_emotion?: EmotionLabel | null;
+  next_portrait_role?: 'loop' | 'tension' | 'release';
   model_provider: 'notochord' | 'local' | 'rule';
   model_available: boolean;
   model_loaded: boolean;
@@ -141,6 +166,45 @@ export interface MusicGeneratorStatus {
   generation_freedom: number;
 }
 
+export interface PresetsTestingStatus {
+  running: boolean;
+  type: 'presets_testing';
+  initial_emotion_ready: boolean;
+  raw_preset_id: string;
+  raw_preset_path: string;
+  raw_meter: string;
+  raw_bpm: number | null;
+  window_start_beat: number;
+  window_bars: number;
+  current_bpm: number;
+  current_emotion: EmotionLabel;
+  source_locked: boolean;
+  rule_percussion_count: number;
+  notochord_percussion_count: number;
+  fallback_count: number;
+  generation_error: string;
+}
+
+export interface NotoTestingStatus {
+  running: boolean;
+  type: 'noto_testing';
+  phase: 'stopped' | 'waiting_for_emotion' | 'notochord_ensemble' | 'error';
+  initial_emotion_ready: boolean;
+  initial_asset_id: string;
+  initial_asset_title: string;
+  initial_asset_path: string;
+  current_emotion: EmotionLabel;
+  profile_scale: string;
+  profile_chord_quality: string;
+  current_bpm: number;
+  window_bars: number;
+  segment_index: number;
+  notochord_event_count: number;
+  notochord_track_counts: Record<string, number>;
+  model_detail: string;
+  generation_error: string;
+}
+
 export interface TrackConfig {
   id: string;
   name: string;
@@ -163,6 +227,10 @@ export interface TrackConfig {
   voicing_enabled?: boolean;
   voicing_density?: number;
   notochord_revoice_rate?: number;
+  notochord_enabled?: boolean;
+  notochord_mode?: 'off' | 'revoice' | 'fill';
+  notochord_rate?: number;
+  notochord_instrument?: number | null;
   arpeggio_enabled?: boolean;
   arpeggio_density?: number;
   arpeggio_rate?: '1/8' | '1/16';

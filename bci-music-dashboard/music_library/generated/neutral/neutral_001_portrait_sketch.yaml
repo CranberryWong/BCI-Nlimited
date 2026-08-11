@@ -1,0 +1,32 @@
+id: neutral_001_portrait_sketch
+title: Measured Pulse
+source_type: original_bci_portrait_sketch
+status: audition_only
+emotion: neutral
+meter: 4/4
+bars: 4
+beats_per_bar: 4
+tempo_bpm: 78
+home_key: C
+mode: major
+duration_beats: 16
+loopable: true
+cadence: open
+energy: 0.42
+density: 0.42
+description: "An even, almost cardiac pulse with a melody that never rushes ahead."
+instruments:
+  xylophone: {role: main_motif_and_machine_polyphony, midi_track: Xylophone, midi_channel: 1}
+  drums: {role: pulse_and_energy, midi_track: Drums, midi_channel: 10}
+  cymbals: {role: phrase_boundary_and_transition, midi_track: Cymbals, midi_channel: 10}
+  electronic: {role: sustained_harmony_and_space, midi_track: Electronic, midi_channel: 2}
+performance:
+  polyphonic_xylophone: true
+  starts_on_bar: 1
+  clean_note_offs: true
+  max_velocity: 90
+  no_pitch_bend: true
+  no_control_changes: true
+quality:
+  approved: false
+  notes: "Original composition sketch. Audition before runtime approval."

@@ -1,6 +1,7 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 from app.storage.presets import PresetStore
 
@@ -29,6 +30,25 @@ class PresetStoreTest(unittest.TestCase):
 
             active = [item for item in store.list() if item["active"]]
             self.assertEqual([item["id"] for item in active], ["ambient-neurofeedback"])
+
+    def test_saving_the_same_name_replaces_the_existing_custom_preset(self) -> None:
+        with TemporaryDirectory() as directory:
+            store = PresetStore(Path(directory))
+            store.save("My Preset", {"global": {"bpm": 96}, "default_tracks": []})
+            store.save("My Preset", {"global": {"bpm": 120}, "default_tracks": []})
+
+            self.assertEqual(len([item for item in store.list() if item["id"] == "my-preset"]), 1)
+            loaded = store.load("my-preset", {"global": {}, "default_tracks": []})
+            self.assertEqual(loaded["global"]["bpm"], 120)
+
+    def test_open_folder_reveals_the_preset_directory(self) -> None:
+        with TemporaryDirectory() as directory:
+            store = PresetStore(Path(directory))
+            with patch("app.storage.presets.subprocess.Popen") as open_folder:
+                store.open_folder()
+
+            open_folder.assert_called_once()
+            self.assertEqual(open_folder.call_args.args[0], ["open", str(Path(directory))])
 
 
 if __name__ == "__main__":

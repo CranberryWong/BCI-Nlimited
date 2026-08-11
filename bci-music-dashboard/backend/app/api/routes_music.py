@@ -12,7 +12,7 @@ def music_generator_status(request: Request):
 
 @router.get("/music-generator/themes")
 def music_generator_themes(request: Request):
-    return request.app.state.theme_library.list()
+    raise HTTPException(status_code=410, detail="portrait runtime does not expose themes")
 
 
 @router.put("/music-generator/theme/{theme_id}")
@@ -55,18 +55,18 @@ def get_music_config(request: Request):
 @router.put("/music/config")
 def put_music_config(payload: dict, request: Request):
     try:
-        config = request.app.state.config_store.replace(payload)
+        request.app.state.config_store.replace(payload)
     except Exception as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     request.app.state.runtime.apply_config()
-    return config.as_api()
+    return request.app.state.config_store.api_payload()
 
 
 @router.post("/music/config/reset")
 def reset_music_config(request: Request):
-    config = request.app.state.config_store.reset()
+    request.app.state.config_store.reset()
     request.app.state.runtime.apply_config()
-    return config.as_api()
+    return request.app.state.config_store.api_payload()
 
 
 @router.get("/music/config/export")
@@ -82,11 +82,11 @@ def export_music_config(request: Request):
 async def import_music_config(request: Request, file: UploadFile = File(...)):
     try:
         text = (await file.read()).decode("utf-8")
-        config = request.app.state.config_store.import_text(text)
+        request.app.state.config_store.import_text(text)
     except Exception as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     request.app.state.runtime.apply_config()
-    return config.as_api()
+    return request.app.state.config_store.api_payload()
 
 
 @router.get("/presets")
@@ -99,12 +99,18 @@ def save_preset(payload: dict, request: Request):
     return request.app.state.presets.save(payload.get("name", "Untitled Preset"), request.app.state.config_store.active_config.as_api())
 
 
+@router.post("/presets/open-folder")
+def open_preset_folder(request: Request):
+    request.app.state.presets.open_folder()
+    return {"ok": True}
+
+
 @router.post("/presets/{preset_id}/load")
 def load_preset(preset_id: str, request: Request):
     try:
         payload = request.app.state.presets.load(preset_id, request.app.state.config_store.reset().as_api())
-        config = request.app.state.config_store.replace(payload)
+        request.app.state.config_store.replace(payload)
     except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     request.app.state.runtime.apply_config()
-    return config.as_api()
+    return request.app.state.config_store.api_payload()

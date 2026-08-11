@@ -14,6 +14,8 @@ from app.core.websocket_manager import WebSocketManager
 from app.music.config_loader import MusicConfigStore
 from app.music.engine import MusicEngine
 from app.music.generation.runtime import MusicGenerationRuntime
+from app.music.generation.presets_testing import PresetsTestingRuntime
+from app.music.generation.noto_testing import NotoTestingRuntime
 from app.music.recorder import SessionRecorder
 from app.music.schemas import EmotionState, MusicEvent
 
@@ -27,6 +29,8 @@ class ProcessManager:
         engine: MusicEngine,
         recorder: SessionRecorder,
         music_generator: MusicGenerationRuntime,
+        presets_testing: PresetsTestingRuntime,
+        noto_testing: NotoTestingRuntime,
     ) -> None:
         self.settings = settings
         self.websocket = websocket
@@ -34,6 +38,8 @@ class ProcessManager:
         self.engine = engine
         self.recorder = recorder
         self.music_generator = music_generator
+        self.presets_testing = presets_testing
+        self.noto_testing = noto_testing
         self.mapper = EmotionMapper()
         self.loop: asyncio.AbstractEventLoop | None = None
         self.latest_emotion: EmotionState | None = None
@@ -56,12 +62,16 @@ class ProcessManager:
     async def shutdown(self) -> None:
         await self.simulator.stop()
         await self.music_generator.stop()
+        await self.presets_testing.stop()
+        await self.noto_testing.stop()
         self.stop_model()
         await self.osc_input.stop()
 
-    async def process_payload(self, valence: int, arousal: int, prob0: float, prob1: float, source: str) -> None:
+    async def process_payload(self, valence: float, arousal: float, prob0: float, prob1: float, source: str) -> None:
         emotion = self.mapper.from_tuple(valence, arousal, prob0, prob1, source=source)
         self.music_generator.add_emotion(emotion)
+        self.presets_testing.add_emotion(emotion)
+        self.noto_testing.add_emotion(emotion)
         events: list[MusicEvent] = []
         self.latest_emotion = emotion
         self.latest_events = events
@@ -88,6 +98,8 @@ class ProcessManager:
             "recording_session_id": self.recorder.active_id,
             "latest_source": self.latest_emotion.source if self.latest_emotion else None,
             "music_generator": self.music_generator.status(),
+            "presets_testing": self.presets_testing.status(),
+            "noto_testing": self.noto_testing.status(),
         }
 
     def start_model(self) -> dict[str, Any]:
@@ -111,6 +123,8 @@ class ProcessManager:
     def apply_config(self) -> None:
         self.engine.update_config(self.config_store.active_config)
         self.music_generator.update_music_config(self.config_store.active_config)
+        self.presets_testing.tracks = self.config_store.active_config.tracks
+        self.noto_testing.update_music_config(self.config_store.active_config)
 
     def dispatch_generated_event(self, event: MusicEvent) -> None:
         self.engine.dispatch_event(event)

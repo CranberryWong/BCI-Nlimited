@@ -1,0 +1,32 @@
+id: sad_001_portrait_sketch
+title: Falling Beads
+source_type: original_bci_portrait_sketch
+status: audition_only
+emotion: sad
+meter: 3/4
+bars: 4
+beats_per_bar: 3
+tempo_bpm: 66
+home_key: A
+mode: minor
+duration_beats: 12
+loopable: false
+cadence: open
+energy: 0.34
+density: 0.56
+description: "Separated falling notes gather into a melody that nearly resolves, then lets go."
+instruments:
+  xylophone: {role: main_motif_and_machine_polyphony, midi_track: Xylophone, midi_channel: 1}
+  drums: {role: pulse_and_energy, midi_track: Drums, midi_channel: 10}
+  cymbals: {role: phrase_boundary_and_transition, midi_track: Cymbals, midi_channel: 10}
+  electronic: {role: sustained_harmony_and_space, midi_track: Electronic, midi_channel: 2}
+performance:
+  polyphonic_xylophone: true
+  starts_on_bar: 1
+  clean_note_offs: true
+  max_velocity: 90
+  no_pitch_bend: true
+  no_control_changes: true
+quality:
+  approved: false
+  notes: "Original composition sketch. Audition before runtime approval."

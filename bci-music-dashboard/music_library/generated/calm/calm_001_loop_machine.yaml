@@ -1,0 +1,33 @@
+id: calm_001_loop_machine
+title: Lake Orbit - Machine Loop
+source_type: original_bci_machine_portrait_variant
+status: audition_only
+emotion: calm
+role: loop
+derived_from: calm_001_portrait_sketch
+meter: 3/4
+bars: 4
+tempo_bpm: 72
+home_key: D
+mode: dorian
+frame_beats: 1.5
+same_key_minimum_interval_seconds: 1.0
+loopable: true
+cadence: open
+energy: 0.24
+density: 0.34
+description: "A stable orbital pattern made from slow, machine-precise rings."
+instruments:
+  xylophone: {role: machine_polyphonic_main_voice, midi_track: Xylophone, midi_channel: 1}
+  drums: {role: macro_pulse, midi_track: Drums, midi_channel: 10}
+  cymbals: {role: phrase_boundary, midi_track: Cymbals, midi_channel: 10}
+  electronic: {role: sustained_space, midi_track: Electronic, midi_channel: 2}
+performance:
+  polyphonic_xylophone: true
+  simultaneous_notes_allowed: true
+  same_key_minimum_interval_seconds: 1.0
+  clean_note_offs: true
+  no_pitch_bend: true
+quality:
+  approved: false
+  notes: "Original machine-safe variation. Test on physical xylophone before approval."

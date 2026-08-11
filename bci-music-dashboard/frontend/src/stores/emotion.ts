@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from '../api/client';
 import { openRealtime } from '../api/websocket';
-import type { CompositionMode, EmotionState, MusicEvent, MusicGeneratorStatus, MusicSegment, SystemMode } from '../types';
+import type { EmotionState, MusicEvent, MusicGeneratorStatus, MusicSegment, NotoTestingStatus, PresetsTestingStatus } from '../types';
 
 export const useEmotionStore = defineStore('emotion', {
   state: () => ({
@@ -10,6 +10,8 @@ export const useEmotionStore = defineStore('emotion', {
     events: [] as MusicEvent[],
     status: {} as Record<string, unknown>,
     generator: null as MusicGeneratorStatus | null,
+    presetsTesting: null as PresetsTestingStatus | null,
+    notoTesting: null as NotoTestingStatus | null,
     currentSegment: null as MusicSegment | null,
     nextSegment: null as MusicSegment | null,
     socket: null as WebSocket | null,
@@ -21,6 +23,10 @@ export const useEmotionStore = defineStore('emotion', {
       if (initialGenerator && typeof initialGenerator === 'object') {
         this.generator = initialGenerator as MusicGeneratorStatus;
       }
+      const initialPresets = this.status.presets_testing;
+      if (initialPresets && typeof initialPresets === 'object') this.presetsTesting = initialPresets as PresetsTestingStatus;
+      const initialNoto = this.status.noto_testing;
+      if (initialNoto && typeof initialNoto === 'object') this.notoTesting = initialNoto as NotoTestingStatus;
       if (this.socket) return;
       this.socket = openRealtime((message) => {
         if (message.kind === 'realtime') {
@@ -32,6 +38,10 @@ export const useEmotionStore = defineStore('emotion', {
           this.events = this.events.slice(0, 100);
           const generator = message.status.music_generator;
           if (generator && typeof generator === 'object') this.generator = generator as MusicGeneratorStatus;
+          const presets = message.status.presets_testing;
+          if (presets && typeof presets === 'object') this.presetsTesting = presets as PresetsTestingStatus;
+          const noto = message.status.noto_testing;
+          if (noto && typeof noto === 'object') this.notoTesting = noto as NotoTestingStatus;
         } else if (message.kind === 'music_event') {
           this.status = message.status;
           this.events.unshift(message.music_event);
@@ -45,6 +55,10 @@ export const useEmotionStore = defineStore('emotion', {
           this.generator = message.status;
         } else if (message.kind === 'generator_status') {
           this.generator = message.status;
+        } else if (message.kind === 'presets_testing_segment_started') {
+          this.presetsTesting = message.presets_testing as PresetsTestingStatus;
+        } else if (message.kind === 'noto_testing_initial_started' || message.kind === 'noto_testing_segment_started' || message.kind === 'noto_testing_error') {
+          this.notoTesting = message.noto_testing as NotoTestingStatus;
         } else if (
           ['phrase_started', 'form_section_changed', 'harmony_changed', 'theme_quoted', 'climax_changed', 'experience_completed', 'mode_changed', 'engaging_stage_changed', 'music_params_changed']
             .includes(message.kind)
@@ -71,24 +85,27 @@ export const useEmotionStore = defineStore('emotion', {
     async stopMusicGenerator() {
       this.generator = (await api.post('/control/stop-music-generator')).data;
     },
-    async reloadMusicModel() {
-      this.generator = (await api.post('/control/reload-music-model')).data;
+    async startPresetsTesting() {
+      this.presetsTesting = (await api.post('/control/start-presets-testing')).data as PresetsTestingStatus;
     },
-    async selectMusicTheme(themeId: string) {
-      this.generator = (await api.put(`/music-generator/theme/${themeId}`)).data;
+    async stopPresetsTesting() {
+      this.presetsTesting = (await api.post('/control/stop-presets-testing')).data as PresetsTestingStatus;
     },
-    async randomMusicTheme() {
-      this.generator = (await api.post('/music-generator/random-theme')).data;
+    async startNotoTesting() {
+      this.notoTesting = (await api.post('/control/start-noto-testing')).data as NotoTestingStatus;
     },
-    async updateMusicGeneratorSettings(settings: {
-      theme_recognition: number;
-      generation_freedom: number;
-      composition_mode?: CompositionMode;
-    }) {
-      this.generator = (await api.patch('/music-generator/settings', settings)).data;
+    async stopNotoTesting() {
+      this.notoTesting = (await api.post('/control/stop-noto-testing')).data as NotoTestingStatus;
     },
-    async setMusicGeneratorMode(systemMode: SystemMode) {
-      this.generator = (await api.post('/music-generator/mode', { system_mode: systemMode })).data;
+    async updatePortraitHarmony(enabled: boolean) {
+      this.generator = (await api.patch('/music-generator/settings', {
+        portrait_harmony_enabled: enabled,
+      })).data;
+    },
+    async updatePortraitHarmonyArpeggio(enabled: boolean) {
+      this.generator = (await api.patch('/music-generator/settings', {
+        portrait_harmony_arpeggio_enabled: enabled,
+      })).data;
     },
   },
 });

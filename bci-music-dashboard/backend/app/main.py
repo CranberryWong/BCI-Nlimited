@@ -13,6 +13,9 @@ from app.music.config_loader import MusicConfigStore
 from app.music.engine import MusicEngine
 from app.music.generation.model import MelodyModel
 from app.music.generation.motif_library import MotifLibrary
+from app.music.generation.portrait_library import PortraitLibrary
+from app.music.generation.presets_testing import PresetsTestingLibrary, PresetsTestingRuntime
+from app.music.generation.noto_testing import NotoTestingRuntime
 from app.music.generation.runtime import MusicGenerationRuntime
 from app.music.generation.theme_library import ThemeLibrary
 from app.music.midi_output import MidiOutput
@@ -45,7 +48,10 @@ async def lifespan(app: FastAPI):
     app.state.melody_model.load()
     app.state.theme_library = ThemeLibrary(settings.resolved_music_library_path)
     app.state.motif_library = MotifLibrary(settings.resolved_music_library_path)
+    app.state.portrait_library = PortraitLibrary(settings.resolved_music_library_path)
+    app.state.presets_testing_library = PresetsTestingLibrary(settings.resolved_music_library_path)
     generator_config = MusicGeneratorConfig(
+        composition_mode="portrait",
         model_provider=settings.music_model_provider,
         model_path=str(settings.resolved_music_model_path),
         model_config_path=str(settings.resolved_music_model_config_path),
@@ -65,11 +71,20 @@ async def lifespan(app: FastAPI):
         app.state.melody_model,
         app.state.theme_library,
         app.state.motif_library,
+        app.state.portrait_library,
         dispatch,
         app.state.engine.all_notes_off,
         app.state.websocket.broadcast,
         app.state.recorder.record_segment,
         app.state.recorder.record_generator_status,
+    )
+    app.state.presets_testing = PresetsTestingRuntime(
+        app.state.presets_testing_library, app.state.config_store.active_config.tracks,
+        app.state.melody_model, dispatch, app.state.engine.all_notes_off, app.state.websocket.broadcast,
+    )
+    app.state.noto_testing = NotoTestingRuntime(
+        app.state.portrait_library, app.state.config_store.active_config,
+        app.state.melody_model, dispatch, app.state.engine.all_notes_off, app.state.websocket.broadcast,
     )
     app.state.runtime = ProcessManager(
         settings,
@@ -78,6 +93,8 @@ async def lifespan(app: FastAPI):
         app.state.engine,
         app.state.recorder,
         app.state.music_generator,
+        app.state.presets_testing,
+        app.state.noto_testing,
     )
     runtime_holder["runtime"] = app.state.runtime
     app.state.recorder.set_model_metadata(app.state.melody_model.public_metadata())

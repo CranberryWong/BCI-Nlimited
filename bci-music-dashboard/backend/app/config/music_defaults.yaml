@@ -112,10 +112,14 @@ default_tracks:
     arpeggio_rate: "1/8"
     arpeggio_max_group_notes: 5
     arpeggio_notochord_rate: 0.2
+    notochord_enabled: false
+    notochord_mode: revoice
+    notochord_rate: 0.25
+    notochord_instrument: 14
     delay_ms: 125
     note_length_ms: 300
     humanize: 0.12
-    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, voicing_enabled, voicing_density, notochord_revoice_rate, arpeggio_enabled, arpeggio_density, arpeggio_rate, arpeggio_max_group_notes, arpeggio_notochord_rate, delay_ms, note_length_ms, humanize, mapping]
+    editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, voicing_enabled, voicing_density, notochord_revoice_rate, arpeggio_enabled, arpeggio_density, arpeggio_rate, arpeggio_max_group_notes, arpeggio_notochord_rate, notochord_enabled, notochord_mode, notochord_rate, notochord_instrument, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.85, arousal_to_velocity: 0.75, arousal_to_density: 0.85, probability_to_randomness: -0.6}
   - id: piano_chord_01
     name: Legacy Piano Accompaniment
@@ -138,6 +142,10 @@ default_tracks:
     delay_ms: 500
     note_length_ms: 1800
     humanize: 0.2
+    notochord_enabled: false
+    notochord_mode: "off"
+    notochord_rate: 0.25
+    notochord_instrument: null
     editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.35, arousal_to_velocity: 0.3, arousal_to_density: 0.2, probability_to_randomness: -0.3}
   - id: chord_pad_01
@@ -161,6 +169,10 @@ default_tracks:
     delay_ms: 500
     note_length_ms: 1800
     humanize: 0.2
+    notochord_enabled: false
+    notochord_mode: fill
+    notochord_rate: 0.25
+    notochord_instrument: null
     editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.35, arousal_to_velocity: 0.3, arousal_to_density: 0.2, probability_to_randomness: -0.3}
   - id: bass_01
@@ -184,6 +196,10 @@ default_tracks:
     delay_ms: 0
     note_length_ms: 600
     humanize: 0.08
+    notochord_enabled: false
+    notochord_mode: revoice
+    notochord_rate: 0.25
+    notochord_instrument: null
     editable_params: [enabled, compute_enabled, instrument, output_type, target_ip, target_port, midi_channel, root_note, scale, pitch_range, velocity_range, bpm, density, polyphony, delay_ms, note_length_ms, humanize, mapping]
     mapping: {valence_to_pitch: 0.25, arousal_to_velocity: 0.55, arousal_to_density: 0.7, probability_to_randomness: -0.4}
   - id: drum_01
@@ -208,6 +224,10 @@ default_tracks:
     note_length_ms: 120
     humanize: 0.1
     drum_notes: {kick: 36, snare: 38, closed_hat: 42, open_hat: 46, crash: 49, ride: 51}
+    notochord_enabled: false
+    notochord_mode: fill
+    notochord_rate: 0.25
+    notochord_instrument: null
     editable_params: [enabled, compute_enabled, output_type, target_ip, target_port, midi_channel, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, drum_notes, mapping]
     mapping: {valence_to_pitch: 0.0, arousal_to_velocity: 0.9, arousal_to_density: 1.0, probability_to_randomness: -0.2}
   - id: cymbal_01
@@ -233,6 +253,11 @@ default_tracks:
     humanize: 0.12
     trigger_on_arousal_rise: true
     arousal_rise_threshold: 0.18
+    drum_notes: {closed_hat: 42, open_hat: 46, crash: 49, ride: 51, splash: 55, bell: 57}
+    notochord_enabled: false
+    notochord_mode: fill
+    notochord_rate: 0.25
+    notochord_instrument: null
     editable_params: [enabled, compute_enabled, output_type, target_ip, target_port, midi_channel, velocity_range, bpm, density, delay_ms, note_length_ms, humanize, trigger_on_arousal_rise, arousal_rise_threshold, mapping]
     mapping: {valence_to_pitch: 0.0, arousal_to_velocity: 0.85, arousal_to_density: 0.95, probability_to_randomness: -0.1}
 system_modes:
@@ -329,6 +354,8 @@ music_parameter_schema:
   arpeggio_density: {type: float, min: 0.0, max: 1.0, editable: true}
   arpeggio_max_group_notes: {type: int, min: 2, max: 5, editable: true}
   arpeggio_notochord_rate: {type: float, min: 0.0, max: 0.5, editable: true}
+  notochord_rate: {type: float, min: 0.0, max: 1.0, editable: true}
+  notochord_instrument: {type: int_or_null, min: 0, max: 255, editable: true}
   delay_ms: {type: int, min: 0, max: 5000, editable: true}
   note_length_ms: {type: int, min: 20, max: 10000, editable: true}
   humanize: {type: float, min: 0.0, max: 1.0, editable: true}

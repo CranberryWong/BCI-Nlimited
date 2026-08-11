@@ -36,6 +36,8 @@ async def stop_simulator(request: Request):
 
 @router.post("/start-music-generator")
 async def start_music_generator(request: Request):
+    if request.app.state.presets_testing.running or request.app.state.noto_testing.running:
+        raise HTTPException(status_code=409, detail="stop the active experiment before starting Generator")
     try:
         request.app.state.music_generator.start()
     except ValueError as exc:
@@ -47,6 +49,39 @@ async def start_music_generator(request: Request):
 async def stop_music_generator(request: Request):
     await request.app.state.music_generator.stop()
     return request.app.state.music_generator.status()
+
+
+@router.post("/start-presets-testing")
+async def start_presets_testing(request: Request):
+    if request.app.state.music_generator.running:
+        raise HTTPException(status_code=409, detail="stop Start Generator before starting the isolated Presets Testing experiment")
+    if request.app.state.noto_testing.running:
+        raise HTTPException(status_code=409, detail="stop Noto Testing before starting Presets Testing")
+    request.app.state.presets_testing.start()
+    return request.app.state.presets_testing.status()
+
+
+@router.post("/stop-presets-testing")
+async def stop_presets_testing(request: Request):
+    await request.app.state.presets_testing.stop()
+    return request.app.state.presets_testing.status()
+
+
+@router.post("/start-noto-testing")
+async def start_noto_testing(request: Request):
+    if request.app.state.music_generator.running or request.app.state.presets_testing.running:
+        raise HTTPException(status_code=409, detail="stop Generator and Presets Testing before starting Noto Testing")
+    try:
+        request.app.state.noto_testing.start()
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return request.app.state.noto_testing.status()
+
+
+@router.post("/stop-noto-testing")
+async def stop_noto_testing(request: Request):
+    await request.app.state.noto_testing.stop()
+    return request.app.state.noto_testing.status()
 
 
 @router.post("/reload-music-model")

@@ -1,0 +1,33 @@
+id: joy_001_release_machine
+title: Skipping Light - Afterimage
+source_type: original_bci_machine_portrait_variant
+status: audition_only
+emotion: joy
+role: release
+derived_from: joy_001_portrait_sketch
+meter: 4/4
+bars: 4
+tempo_bpm: 84
+home_key: G
+mode: major_pentatonic
+frame_beats: 4
+same_key_minimum_interval_seconds: 1.0
+loopable: false
+cadence: closed
+energy: 0.28
+density: 0.22
+description: "The bright skips leave four widely spaced afterimages."
+instruments:
+  xylophone: {role: machine_polyphonic_main_voice, midi_track: Xylophone, midi_channel: 1}
+  drums: {role: macro_pulse, midi_track: Drums, midi_channel: 10}
+  cymbals: {role: phrase_boundary, midi_track: Cymbals, midi_channel: 10}
+  electronic: {role: sustained_space, midi_track: Electronic, midi_channel: 2}
+performance:
+  polyphonic_xylophone: true
+  simultaneous_notes_allowed: true
+  same_key_minimum_interval_seconds: 1.0
+  clean_note_offs: true
+  no_pitch_bend: true
+quality:
+  approved: false
+  notes: "Original machine-safe variation. Test on physical xylophone before approval."

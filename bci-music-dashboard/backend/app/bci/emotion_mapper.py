@@ -18,10 +18,12 @@ class EmotionMapper:
         prob1: float,
         source: str = "osc_input",
     ) -> EmotionState:
-        valence_class = max(1, min(9, int(round(float(valence)))))
-        arousal_class = max(1, min(9, int(round(float(arousal)))))
-        valence_norm = (valence_class - 1) / 8
-        arousal_norm = (arousal_class - 1) / 8
+        valence_value = max(1.0, min(9.0, float(valence)))
+        arousal_value = max(1.0, min(9.0, float(arousal)))
+        valence_class = int(round(valence_value))
+        arousal_class = int(round(arousal_value))
+        valence_norm = (valence_value - 1) / 8
+        arousal_norm = (arousal_value - 1) / 8
         confidence = max(0.0, min(1.0, max(float(prob0), float(prob1))))
         direct_key = f"{valence_class}:{arousal_class}"
         label = self.direct_mapping.get(direct_key) or self._quadrant_label(valence_norm, arousal_norm)

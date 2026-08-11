@@ -399,6 +399,175 @@ class MelodyModel:
             "notes": sorted(updated_notes, key=lambda note: (note.beat, note.track_id, note.pitch)),
         })
 
+    def assist_portrait_segment(
+        self,
+        segment: MusicSegment,
+        tracks: list[TrackConfig],
+    ) -> MusicSegment:
+        """Apply bounded per-track Notochord variation to arranger-owned notes.
+
+        Portrait source MIDI is intentionally immutable. Only notes explicitly
+        marked by the arranger are candidates, so a model error never destroys
+        a Portrait's authored identity.
+        """
+        if self.active_provider != "notochord" or self.model is None:
+            return segment
+        configured = [
+            track for track in tracks
+            if track.enabled
+            and track.compute_enabled
+            and bool(getattr(track, "notochord_enabled", False))
+            and isinstance(getattr(track, "notochord_instrument", None), int)
+            and getattr(track, "notochord_mode", "off") != "off"
+        ]
+        if not configured:
+            return segment
+
+        by_id = {track.id: track for track in configured}
+        candidates = {
+            track.id: [
+                note for note in segment.notes
+                if note.track_id == track.id and note.notochord_eligible and note.voice_role != "theme"
+            ]
+            for track in configured
+        }
+        fill_slot_ids: set[int] = set()
+        for track in configured:
+            if getattr(track, "notochord_mode", "off") != "fill":
+                continue
+            slots = self._portrait_fill_slots(segment, track)
+            candidates[track.id].extend(slots)
+            fill_slot_ids.update(id(slot) for slot in slots)
+        if not any(candidates.values()):
+            return segment
+
+        self.model.reset()
+        cursor = 0.0
+        for note in sorted(segment.notes, key=lambda item: (item.beat, item.track_id, item.pitch)):
+            track = by_id.get(note.track_id)
+            instrument = self._track_notochord_instrument(track) if track else self.notochord_instrument
+            self.model.feed(instrument, note.pitch, max(0.0, note.beat - cursor) * 60.0 / segment.bpm, note.velocity)
+            self.model.feed(instrument, note.pitch, note.duration_beats * 60.0 / segment.bpm, 0)
+            cursor = max(cursor, note.beat + note.duration_beats)
+
+        replacements: dict[int, SegmentNote] = {}
+        additions: list[SegmentNote] = []
+        counts: dict[str, int] = {}
+        for track in configured:
+            mode = str(getattr(track, "notochord_mode", "off"))
+            rate = max(0.0, min(1.0, float(getattr(track, "notochord_rate", .25))))
+            pool = candidates[track.id]
+            budget = min(len(pool), max(0, round(len(pool) * rate)))
+            if not budget:
+                continue
+            for index, note in enumerate(pool):
+                if counts.get(track.id, 0) >= budget or index % max(1, round(1 / rate)):
+                    continue
+                choices = self._portrait_assist_choices(segment, track, note)
+                if not choices:
+                    continue
+                result = self.model.query(
+                    next_inst=self._track_notochord_instrument(track),
+                    next_time=max(0.0, note.beat) * 60.0 / segment.bpm,
+                    include_pitch=choices,
+                    min_vel=max(track.velocity_range[0], note.velocity - 12),
+                    max_vel=min(track.velocity_range[1], note.velocity + 8),
+                    pitch_temp=.72,
+                    velocity_temp=.62,
+                )
+                pitch = int(self._number(result["pitch"]))
+                velocity = int(self._number(result["vel"]))
+                if pitch not in choices:
+                    continue
+                updated = note.model_copy(update={
+                    "pitch": pitch,
+                    "velocity": max(1, min(127, velocity)),
+                    "generated_by": "notochord",
+                })
+                if mode == "fill":
+                    beat = note.beat if id(note) in fill_slot_ids else round(
+                        note.beat + min(.5, max(.25, note.duration_beats / 2)), 3
+                    )
+                    if beat >= segment.total_beats or any(
+                        item.track_id == track.id and item.pitch == pitch and abs(item.beat - beat) < .001
+                        for item in segment.notes + additions
+                    ):
+                        continue
+                    additions.append(updated.model_copy(update={"beat": beat, "duration_beats": min(.4, note.duration_beats)}))
+                else:
+                    replacements[id(note)] = updated
+                counts[track.id] = counts.get(track.id, 0) + 1
+
+        if not replacements and not additions:
+            return segment
+        notes = [replacements.get(id(note), note) for note in segment.notes] + additions
+        return segment.model_copy(update={
+            "source": "hybrid",
+            "notes": sorted(notes, key=lambda item: (item.beat, item.track_id, item.pitch)),
+            "notochord_modified_count": sum(counts.values()),
+            "notochord_track_counts": counts,
+            "arpeggio_note_count": sum(note.voice_role == "ornament" for note in notes),
+        })
+
+    @staticmethod
+    def _track_notochord_instrument(track: TrackConfig | None) -> int:
+        return int(getattr(track, "notochord_instrument", 14)) if track else 14
+
+    @staticmethod
+    def _portrait_assist_choices(
+        segment: MusicSegment,
+        track: TrackConfig,
+        note: SegmentNote,
+    ) -> list[int]:
+        low, high = track.pitch_range
+        if track.role in {"drum", "cymbal"}:
+            mapping = getattr(track, "drum_notes", {})
+            mapped = mapping.values() if isinstance(mapping, dict) else []
+            return [pitch for pitch in mapped if low <= int(pitch) <= high]
+        if segment.harmony:
+            bar = min(int(note.beat // segment.beats_per_bar), len(segment.harmony) - 1)
+            allowed_classes = chord_pitch_classes(segment.root_note, segment.harmony[bar])
+        else:
+            allowed_classes = {pitch % 12 for pitch in scale_notes(root_pc(segment.root_note), segment.scale, low, high)}
+        return [pitch for pitch in range(low, high + 1) if pitch % 12 in allowed_classes]
+
+    @staticmethod
+    def _portrait_fill_slots(segment: MusicSegment, track: TrackConfig) -> list[SegmentNote]:
+        """Create silent, role-specific candidate slots; they render only if selected."""
+        duration = {
+            "pad": min(1.5, segment.beats_per_bar * .7),
+            "bass": .5,
+            "drum": .2,
+            "cymbal": .35,
+        }.get(track.role, .3)
+        beats: list[float] = []
+        if track.role == "pad":
+            beats = [float(bar * segment.beats_per_bar) for bar in range(segment.bars)]
+        elif track.role == "bass":
+            beats = [float(bar * segment.beats_per_bar + segment.beats_per_bar / 2) for bar in range(segment.bars)]
+        elif track.role == "drum":
+            beats = [float(bar * segment.beats_per_bar) for bar in range(segment.bars)]
+            if segment.beats_per_bar >= 4:
+                beats.extend(float(bar * segment.beats_per_bar + 2) for bar in range(segment.bars))
+        elif track.role == "cymbal":
+            beats = [0.0, float((segment.bars - 1) * segment.beats_per_bar)]
+        else:
+            return []
+        return [
+            SegmentNote(
+                beat=round(beat, 3),
+                duration_beats=duration,
+                pitch=track.pitch_range[0],
+                velocity=max(track.velocity_range[0], min(track.velocity_range[1], 64)),
+                track_id=track.id,
+                channel=track.midi_channel,
+                generated_by="rule",
+                notochord_eligible=True,
+            )
+            for beat in sorted(set(beats))
+            if 0 <= beat < segment.total_beats
+        ]
+
     def _generate_notochord(
         self,
         emotion: EmotionState,

@@ -14,7 +14,7 @@ OutputType = Literal["midi", "osc"]
 MusicEventType = Literal["note_on", "note_off", "control", "osc"]
 VoiceRole = Literal["theme", "harmony", "ornament"]
 NoteGenerator = Literal["theme", "rule", "notochord"]
-CompositionMode = Literal["theme", "motif", "hybrid", "anchored", "generative"]
+CompositionMode = Literal["theme", "motif", "hybrid", "anchored", "generative", "portrait"]
 
 
 class EmotionState(BaseModel):
@@ -101,6 +101,9 @@ class SegmentNote(BaseModel):
     channel: int = Field(ge=1, le=16)
     voice_role: VoiceRole | None = None
     generated_by: NoteGenerator = "rule"
+    # Authored Portrait notes are immutable. Arrangers opt individual rule notes
+    # into constrained Notochord variation with this flag.
+    notochord_eligible: bool = False
 
 
 class MusicSegment(BaseModel):
@@ -112,13 +115,16 @@ class MusicSegment(BaseModel):
     beats_per_bar: int = Field(default=4, ge=1, le=12)
     root_note: str = "C"
     scale: str = "gong"
-    source: Literal["model", "rule", "theme", "motif", "hybrid"]
+    source: Literal["model", "rule", "theme", "motif", "portrait", "hybrid"]
     form_section: FormSection = "theme"
     phrase_id: str = ""
     theme_id: str = ""
     motif_id: str = ""
     motif_title: str = ""
     portrait: EmotionLabel | None = None
+    portrait_asset_id: str = ""
+    portrait_asset_title: str = ""
+    portrait_role: Literal["loop", "tension", "release", "sketch", ""] = ""
     theme_similarity: float = Field(default=0.0, ge=0.0, le=1.0)
     harmony: list[str] = Field(default_factory=list)
     transition_type: str = "continue"
@@ -127,10 +133,16 @@ class MusicSegment(BaseModel):
     transition_progress: float = Field(default=0.0, ge=0.0, le=1.0)
     transition_strategy: str = ""
     ornamented_beats: list[float] = Field(default_factory=list)
-    actual_max_voices: int = Field(default=1, ge=1, le=8)
+    actual_max_voices: int = Field(default=1, ge=1, le=32)
     harmony_note_count: int = Field(default=0, ge=0)
     arpeggio_note_count: int = Field(default=0, ge=0)
     notochord_modified_count: int = Field(default=0, ge=0)
+    notochord_track_counts: dict[str, int] = Field(default_factory=dict)
+    base_bpm: int | None = Field(default=None, ge=30, le=220)
+    target_bpm: int | None = Field(default=None, ge=30, le=220)
+    bass_note_count: int = Field(default=0, ge=0)
+    drum_note_count: int = Field(default=0, ge=0)
+    cymbal_note_count: int = Field(default=0, ge=0)
     generated_at: float = Field(default_factory=time.time)
     generation_ms: float = Field(default=0.0, ge=0.0)
     notes: list[SegmentNote] = Field(default_factory=list)

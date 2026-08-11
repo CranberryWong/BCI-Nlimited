@@ -30,13 +30,16 @@
     />
     <MusicGeneratorPanel
       :status="emotion.generator"
+      :presets-testing="emotion.presetsTesting"
+      :noto-testing="emotion.notoTesting"
       @start="run(emotion.startMusicGenerator)"
       @stop="run(emotion.stopMusicGenerator)"
-      @reload="run(emotion.reloadMusicModel)"
-      @select-theme="run(() => emotion.selectMusicTheme($event))"
-      @random-theme="run(emotion.randomMusicTheme)"
-      @update-settings="run(() => emotion.updateMusicGeneratorSettings($event))"
-      @set-mode="run(() => emotion.setMusicGeneratorMode($event))"
+      @start-presets-testing="run(emotion.startPresetsTesting)"
+      @stop-presets-testing="run(emotion.stopPresetsTesting)"
+      @start-noto-testing="run(emotion.startNotoTesting)"
+      @stop-noto-testing="run(emotion.stopNotoTesting)"
+      @update-portrait-harmony="run(() => emotion.updatePortraitHarmony($event))"
+      @update-portrait-harmony-arpeggio="run(() => emotion.updatePortraitHarmonyArpeggio($event))"
     />
     <section class="lower">
       <TrackList :tracks="tracks.tracks" @edit="selected = $event" @toggle="run(() => tracks.patchTrack($event))" @duplicate="run(() => tracks.duplicate($event))" @remove="run(() => tracks.remove($event))" @add="run(() => tracks.add($event))" />
@@ -57,6 +60,7 @@
 
 <script setup lang="ts">
 import { BookOpenText, SlidersHorizontal } from 'lucide-vue-next';
+import { isAxiosError } from 'axios';
 import { NButton, NDataTable, NIcon, useMessage, type DataTableColumns } from 'naive-ui';
 import { onMounted, ref } from 'vue';
 import type { MusicConfig, MusicEvent, TrackConfig } from '../../types';
@@ -91,7 +95,8 @@ async function run(action: () => Promise<unknown>) {
   try {
     await action();
   } catch (error) {
-    message.error(error instanceof Error ? error.message : 'Request failed');
+    const detail = isAxiosError(error) ? error.response?.data?.detail : undefined;
+    message.error(typeof detail === 'string' ? detail : error instanceof Error ? error.message : 'Request failed');
   }
 }
 async function saveTrack(track: TrackConfig) {

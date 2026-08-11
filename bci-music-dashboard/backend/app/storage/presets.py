@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import time
 from pathlib import Path
 from typing import Any
@@ -50,6 +51,9 @@ class PresetStore:
         path.write_text(yaml.safe_dump(config, allow_unicode=True, sort_keys=False), encoding="utf-8")
         self._set_active(slug)
         return {"id": slug, "name": name, "builtin": False, "active": True}
+
+    def open_folder(self) -> None:
+        subprocess.Popen(["open", str(self.root)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     def load(self, preset_id: str, default_config: dict[str, Any]) -> dict[str, Any]:
         if preset_id in BUILTIN_PRESETS:

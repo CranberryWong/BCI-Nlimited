@@ -1,18 +1,21 @@
 <template>
   <section class="monitor surface">
     <aside class="status">
-      <h2>情绪监测界面</h2>
-      <div class="metric"><span>Valence</span><strong>{{ latest?.valence_class ?? '--' }}</strong></div>
-      <div class="metric"><span>Arousal</span><strong>{{ latest?.arousal_class ?? '--' }}</strong></div>
-      <div class="emotion">{{ label }}</div>
-      <n-descriptions :column="1" size="small" label-placement="left">
-        <n-descriptions-item label="输入源">{{ latest?.source ?? status.latest_source ?? 'waiting' }}</n-descriptions-item>
-        <n-descriptions-item label="模型">{{ status.model_status ?? 'loading' }}</n-descriptions-item>
-        <n-descriptions-item label="输入 OSC">{{ status.osc_input ?? '--' }}</n-descriptions-item>
-        <n-descriptions-item label="置信度">{{ confidence }}</n-descriptions-item>
-      </n-descriptions>
+      <h3>Emotion Monitor</h3>
+      <p class="monitor-intro">实时展示情绪信号、输入状态与模型置信度。</p>
+      <div class="emotion-summary">
+        <div class="metric"><span>Valence</span><strong>{{ latest?.valence_class ?? '--' }}</strong></div>
+        <div class="metric"><span>Arousal</span><strong>{{ latest?.arousal_class ?? '--' }}</strong></div>
+        <div class="metric"><span>Current Emotion</span><strong>{{ label }}</strong></div>
+      </div>
+      <div class="status-details">
+        <div><span>Input Source</span><strong>{{ latest?.source ?? status.latest_source ?? 'waiting' }}</strong></div>
+        <div><span>Model</span><strong>{{ status.model_status ?? 'loading' }}</strong></div>
+        <div><span>OSC Input</span><strong>{{ status.osc_input ?? '--' }}</strong></div>
+        <div><span>Confidence</span><strong>{{ confidence }}</strong></div>
+      </div>
       <div class="control-grid">
-        <n-button type="primary" @click="$emit('start-simulator')">Start Simulator</n-button>
+        <n-button type="primary" :disabled="simulatorRunning" @click="$emit('start-simulator')">Start Simulator</n-button>
         <n-button @click="$emit('stop-simulator')">Stop</n-button>
         <n-button :disabled="status.model_available === false" @click="$emit('start-model')">Start Model</n-button>
         <n-button @click="$emit('stop-model')">Stop Model</n-button>
@@ -26,16 +29,16 @@
 
 <script setup lang="ts">
 import * as echarts from 'echarts';
-import { NButton, NDescriptions, NDescriptionsItem } from 'naive-ui';
+import { NButton } from 'naive-ui';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { EmotionState } from '../../types';
 
 const props = defineProps<{ latest: EmotionState | null; history: EmotionState[]; status: Record<string, unknown> }>();
 defineEmits(['start-simulator', 'stop-simulator', 'start-model', 'stop-model']);
 
-const zh: Record<string, string> = { joy: '高兴', calm: '平静', neutral: '中性', tense: '紧张', sad: '悲伤' };
-const label = computed(() => `当前情绪: ${props.latest ? zh[props.latest.label] : '等待数据'}`);
+const label = computed(() => props.latest?.label ?? 'waiting');
 const confidence = computed(() => (props.latest ? `${Math.round(props.latest.confidence * 100)}%` : '--'));
+const simulatorRunning = computed(() => props.status.simulator_running === true);
 const chartEl = ref<HTMLDivElement>();
 let chart: echarts.ECharts | null = null;
 
@@ -87,10 +90,14 @@ watch(() => props.history.length, render);
   gap: 22px;
 }
 
-h2 {
-  margin: 0 0 18px;
-  text-align: center;
-  font-size: 30px;
+h3 {
+  margin: 0;
+}
+
+.monitor-intro {
+  margin: -8px 0 0;
+  color: #5a6773;
+  font-size: 13px;
 }
 
 .status {
@@ -100,23 +107,51 @@ h2 {
 }
 
 .metric {
-  display: flex;
-  justify-content: space-between;
-  font-size: 24px;
+  display: grid;
+  gap: 4px;
 }
 
-.metric strong {
-  min-width: 48px;
-  text-align: right;
+.emotion-summary,
+.status-details {
+  display: grid;
+  border: 1px solid #000;
+  background: #fff;
 }
 
-.emotion {
-  border-radius: 0;
-  background: #dff0dd;
-  padding: 20px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 25px;
+.emotion-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.emotion-summary .metric {
+  padding: 12px;
+}
+
+.emotion-summary .metric + .metric {
+  border-left: 1px solid #000;
+}
+
+.metric span,
+.status-details span {
+  color: #5a6773;
+  font-size: 12px;
+}
+
+.status-details {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.status-details > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.status-details > div:nth-child(even) {
+  border-left: 1px solid #000;
+}
+
+.status-details > div:nth-child(n + 3) {
+  border-top: 1px solid #000;
 }
 
 .chart-wrap {
@@ -141,8 +176,12 @@ h2 {
   .monitor {
     grid-template-columns: 1fr;
   }
-  h2 {
-    font-size: 26px;
+  .emotion-summary {
+    grid-template-columns: 1fr;
+  }
+  .emotion-summary .metric + .metric {
+    border-top: 1px solid #000;
+    border-left: 0;
   }
 }
 </style>
