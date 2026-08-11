@@ -1,4 +1,4 @@
-import type { EmotionState, MusicEvent, MusicGeneratorStatus, MusicSegment, NotoTestingStatus, PresetsTestingStatus } from '../types';
+import type { AdaptiveRuntimeStatus, EmotionState, MusicEvent, MusicGeneratorStatus, MusicSegment, NotoTestingStatus, PresetsTestingStatus } from '../types';
 
 export type RealtimeMessage =
   | { kind: 'status'; status: Record<string, unknown> }
@@ -11,7 +11,8 @@ export type RealtimeMessage =
   | { kind: 'presets_testing_segment_started'; segment: MusicSegment; presets_testing: PresetsTestingStatus }
   | { kind: 'noto_testing_initial_started'; segment: MusicSegment; noto_testing: NotoTestingStatus }
   | { kind: 'noto_testing_segment_started'; segment: MusicSegment; noto_testing: NotoTestingStatus }
-  | { kind: 'noto_testing_error'; noto_testing: NotoTestingStatus };
+  | { kind: 'noto_testing_error'; noto_testing: NotoTestingStatus }
+  | { version: 'v1'; type: string; seq: number; timestamp: number; session_id: string | null; payload: { status?: AdaptiveRuntimeStatus; event?: Record<string, unknown>; [key: string]: unknown } };
 
 export function openRealtime(onMessage: (message: RealtimeMessage) => void) {
   const scheme = location.protocol === 'https:' ? 'wss' : 'ws';

@@ -29,7 +29,11 @@ def download(session_id: str, format: str, request: Request):
     except KeyError as exc:
         raise HTTPException(
             status_code=400,
-            detail="format must be mid, csv, emotion-jsonl, music-jsonl, config, segments, generator-status, model-metadata, or composition-metadata",
+            detail=(
+                "format must be mid, wav, magenta-midi, magenta-events, csv, emotion-jsonl, "
+                "music-jsonl, runtime-log, summary, config, segments, generator-status, "
+                "model-metadata, or composition-metadata"
+            ),
         ) from exc
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="session artifact not found") from exc
@@ -38,6 +42,11 @@ def download(session_id: str, format: str, request: Request):
         "csv": "text/csv",
         "emotion-jsonl": "application/x-ndjson",
         "music-jsonl": "application/x-ndjson",
+        "runtime-log": "application/x-ndjson",
+        "wav": "audio/wav",
+        "magenta-midi": "audio/midi",
+        "magenta-events": "text/csv",
+        "summary": "application/json",
         "config": "application/x-yaml",
         "segments": "application/x-ndjson",
         "generator-status": "application/json",

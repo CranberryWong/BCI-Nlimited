@@ -15,6 +15,7 @@ dependencies = [
   "python-rtmidi>=1.5,<2",
   "sounddevice>=0.5,<1",
   "soundfile>=0.12,<1",
+  "websockets>=12,<17",
 ]
 
 [project.optional-dependencies]
@@ -22,6 +23,7 @@ test = ["pytest>=8,<10"]
 
 [project.scripts]
 magenta-flow = "magenta_flow.cli:main"
+magenta-worker = "magenta_flow.worker:main"
 
 [tool.setuptools.packages.find]
 include = ["magenta_flow*"]
@@ -29,4 +31,3 @@ include = ["magenta_flow*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-

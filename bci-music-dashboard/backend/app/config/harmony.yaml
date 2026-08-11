@@ -1,0 +1,21 @@
+provider: rule
+notochord:
+  enabled: false
+  timeout_seconds: 0.20
+  roles: [harmony, bass, inner_voice]
+progressions:
+  identity: [I, IV, V, I]
+  contrast: [vi, IV, ii, V]
+  development: [ii, V, iii, vi]
+  climax: [IV, V, V, I]
+  return: [I, IV, V, I]
+  coda: [IV, I, I, I]
+counterpoint:
+  enabled: true
+  maximum_voices: 2
+  forms: [contrast, development]
+  entry_delay_beats: 2
+  interval_semitones: 7
+  allow_inversion: true
+  reject_parallel_fifths: true
+  reject_parallel_octaves: true

@@ -105,10 +105,22 @@ class SessionRecorder:
         sessions = []
         for path in sorted(self.root.iterdir(), reverse=True):
             if path.is_dir():
-                sessions.append({"id": path.name, "files": sorted(child.name for child in path.iterdir() if child.is_file())})
+                sessions.append({
+                    "id": path.name,
+                    "files": sorted(str(child.relative_to(path)) for child in path.rglob("*") if child.is_file()),
+                })
         return sessions
 
     def artifact(self, session_id: str, file_format: str) -> Path:
+        session_dir = (self.root / session_id).resolve()
+        if session_dir.parent != self.root.resolve():
+            raise FileNotFoundError(session_dir)
+        if file_format in {"wav", "magenta-midi", "magenta-events"}:
+            suffix = {"wav": "*.wav", "magenta-midi": "*.mid", "magenta-events": "*-events.csv"}[file_format]
+            matches = sorted((session_dir / "magenta").glob(suffix))
+            if not matches:
+                raise FileNotFoundError(session_dir / "magenta" / suffix)
+            return matches[-1]
         filenames = {
             "mid": "music.mid",
             "csv": "emotion.csv",
@@ -119,10 +131,12 @@ class SessionRecorder:
             "generator-status": "generator_status.json",
             "model-metadata": "model_metadata.json",
             "composition-metadata": "composition_metadata.json",
+            "runtime-log": "runtime_event_log.jsonl",
+            "summary": "adaptive_summary.json",
         }
         if file_format not in filenames:
             raise KeyError(file_format)
-        path = self.root / session_id / filenames[file_format]
+        path = session_dir / filenames[file_format]
         if not path.exists():
             raise FileNotFoundError(path)
         return path

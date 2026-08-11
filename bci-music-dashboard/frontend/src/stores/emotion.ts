@@ -29,6 +29,7 @@ export const useEmotionStore = defineStore('emotion', {
       if (initialNoto && typeof initialNoto === 'object') this.notoTesting = initialNoto as NotoTestingStatus;
       if (this.socket) return;
       this.socket = openRealtime((message) => {
+        if ('version' in message) return;
         if (message.kind === 'realtime') {
           this.status = message.status;
           this.latest = message.emotion;

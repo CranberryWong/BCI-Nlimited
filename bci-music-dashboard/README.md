@@ -4,10 +4,22 @@ BCI Music Dashboard is a FastAPI and Vue 3 single page dashboard for turning rea
 `[valence, arousal, prob0, prob1]` tuples into emotion telemetry, generated music
 events, OSC/MIDI output, and reproducible session exports.
 
+The primary runtime is now `adaptive_performance`: BCI remains the emotional source
+of truth while time, weather, heart rate, motion, light, and posture provide bounded
+auxiliary modulation. A YAML policy compiles those inputs into `MusicIntent`, then
+independent tonal, form, motif, harmony, counterpoint, melody, and orchestration
+modules feed one transport clock and one central output hub. Legacy generators and
+routes remain available for one migration cycle, but are not dependencies of the new
+runtime.
+
 ## Project Layout
 
 - `backend/app/bci`: OSC input, async simulator, XDF/model watcher, emotion mapping.
 - `backend/app/music`: YAML-backed config, track schemas, music engine, MIDI/OSC output, recording.
+- `backend/app/adaptive`: input contracts, Context Hub, policy, composition planners,
+  MRT2 client, Transport, OutputHub, unified journal, and performance runtime.
+- `backend/app/config/{inputs,policy,form,tonal,motif,melody,harmony,orchestration,outputs}.yaml`:
+  the complete adaptive performance configuration.
 - `frontend/src/views/Dashboard`: monitor, track editor, output test, recorder, music config drawer.
 - `models`: local model drop folder. The directory is tracked; `.pkl` files are ignored.
 - `backend/app/legacy`: untouched copies of the old Flask OSC sender and test sender.
@@ -59,6 +71,10 @@ reported as `model_missing`; the backend and simulator still start, while
 4. Click `Start Simulator`. The dashboard curve and music event table update through
    `/ws/realtime`.
 
+5. Open `Adaptive Config`, set the explicit weather latitude/longitude if weather is
+   enabled, then click `Start Performance`. Configuration is immutable until the
+   performance stops.
+
 ## Windows
 
 Use PowerShell from `bci-music-dashboard`:
@@ -82,11 +98,13 @@ an IAC bus in Audio MIDI Setup, refresh `GET /api/outputs/midi-ports`, set a tra
 `midi`, and choose an output mode that includes MIDI. If no port is available,
 the backend remains in mock MIDI mode.
 
-## Docker Compose
+## Docker Compose (rule fallback)
 
-Docker is the recommended deployment mode for a dedicated workstation. The frontend
+Docker is a compatibility/development mode. The formal MRT2 performance environment
+is an Apple Silicon Mac running native processes. In Docker or Windows, the frontend
 is built once and served by Nginx, which proxies `/api` and `/ws` to FastAPI. Models,
-presets, sessions, and XDF recordings stay on host-mounted directories.
+presets, sessions, and XDF recordings stay on host-mounted directories, while melody
+generation uses the deterministic motif-rule fallback.
 
 ### Online target workstation
 
@@ -146,8 +164,37 @@ The Compose environment maps default localhost OSC output to `host.docker.intern
 - OSC input: send `/eeg/valence_arousal` with four args to
   `BCI_INPUT_OSC_IP:BCI_INPUT_OSC_PORT`, default UDP port `8000`.
 
-Input OSC port `8000` is distinct from output OSC targets. Output OSC defaults to
-`127.0.0.1:57120` for Max/MSP but each track can override IP and port.
+BCI OSC port `8000` is distinct from generic sensor OSC port `8002`. Sensor adapters
+accept normalized heart rate, motion, light, and posture messages; Kinect or any
+future body tracker only needs to publish `motion`, `expansion`, `symmetry`,
+`verticality`, `gesture`, and `confidence` rather than linking its SDK to the music
+core.
+
+Weather uses Open-Meteo outside the realtime loop with a 1.5 second timeout, ten
+minute refresh, three-failure circuit breaker, and a thirty-minute last-valid cache.
+An unavailable service never blocks Transport.
+
+## Adaptive Performance API
+
+- `GET /api/inputs/status`
+- `POST /api/inputs/{source_id}/sample`
+- `GET|PUT /api/config/{module}`
+- `POST /api/performance/start|stop`
+- `GET /api/runtime/status`
+- `POST /api/diagnostics/run`
+
+Realtime WebSocket messages use the versioned envelope
+`{version,type,seq,timestamp,session_id,payload}`. YAML is the human-authored source;
+JSON is used only for HTTP, WebSocket, OSC metadata, and logs.
+
+Run the two-hour onsite acceptance monitor against a live native backend with:
+
+```bash
+python backend/scripts/soak_adaptive.py --duration-seconds 7200
+```
+
+It always stops the performance in `finally` and fails on MRT2 frame time,
+transcription-to-MIDI p95, scheduler jitter, or an unexpected runtime stop.
 
 ## Music Configuration
 
@@ -179,20 +226,24 @@ Each non-percussion track exposes two independent density controls:
 
 Both values are included when saving a preset.
 
-## Outputs
+## Central Outputs
 
-OSC note events use addresses such as:
+The adaptive runtime has no per-track IP or port. `outputs.yaml` owns the MIDI device,
+role-to-channel map, audio settings, and all OSC targets. TouchDesigner defaults to
+`127.0.0.1:9000` and receives:
 
 ```text
-/music/track/{track_id}/note
-/music/track/{track_id}/control
-/music/emotion
-/music/global
+/v1/music/note
+/v1/music/transport
+/v1/music/state
+/v1/music/harmony
+/v1/music/section
+/v1/music/health
 ```
 
-For Max/MSP, listen on the track target port, commonly `57120`, and parse the note
-payload `[event_type, pitch, velocity, duration_ms, midi_channel]`. Use the dashboard
-`Test Output` button or `POST /api/outputs/test` to send a test note.
+TouchDesigner and physical instruments are dispatched in parallel; visual latency or
+failure cannot hold the music clock. Legacy per-track targets are imported as disabled
+central targets for operator review.
 
 MIDI output uses `mido` and tries `python-rtmidi`. If host MIDI support is absent,
 `GET /api/outputs/midi-ports` reports mock mode instead of crashing.
@@ -204,13 +255,14 @@ Recording APIs:
 - `POST /api/sessions/start`
 - `POST /api/sessions/stop`
 - `GET /api/sessions`
-- `GET /api/sessions/{id}/download?format=mid|csv|emotion-jsonl|music-jsonl|config`
+- `GET /api/sessions/{id}/download?format=mid|wav|csv|emotion-jsonl|music-jsonl|runtime-log|summary|config`
 
 Each stopped session stores:
 
 - emotion time series CSV;
 - emotion timeline JSONL;
 - music event log JSONL;
+- canonical adaptive runtime event/log JSONL;
 - generated MIDI file;
 - `music_config_snapshot.yaml`.
 
@@ -239,3 +291,7 @@ The old `app_send_osc.py` and `send_osc_fortest.py` are copied under
 `backend/app/legacy`. They are not imported by FastAPI. Their reusable XDF parsing,
 model windowing, model probability mapping, OSC tuple layout, and simulator tuple
 layout have been moved into the modular backend services.
+
+`MIRROR` and `ENGAGING` remain only on legacy routes during the migration period.
+They are not exposed by `adaptive_performance`, which has one pre-performance policy
+snapshot and no user mode switch.

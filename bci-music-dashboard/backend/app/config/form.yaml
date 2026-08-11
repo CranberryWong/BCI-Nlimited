@@ -1,0 +1,26 @@
+template: adaptive_rondo
+beats_per_bar: 4
+phrase_bars: 2
+minimum_phrases_per_section: 2
+emotion_change_budget: 3
+slow_window_seconds: 16
+fast_window_seconds: 4
+transition_confidence: 0.60
+sections:
+  - {id: intro, role: intro}
+  - {id: A1, role: identity}
+  - {id: B, role: contrast}
+  - {id: A2, role: return}
+  - {id: C, role: development}
+  - {id: climax, role: climax}
+  - {id: A3, role: return}
+  - {id: coda, role: coda}
+transitions:
+  intro: [A1]
+  A1: [A1, B]
+  B: [B, A2]
+  A2: [A2, C]
+  C: [C, climax]
+  climax: [A3]
+  A3: [A3, coda]
+  coda: []

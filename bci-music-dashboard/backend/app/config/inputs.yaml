@@ -1,0 +1,34 @@
+strategy: adaptive_performance
+bci:
+  source_id: bci.primary
+  stale_after_seconds: 5
+  neutral_return_seconds: 10
+  minimum_confidence: 0.45
+time:
+  enabled: true
+  source_id: system.clock
+weather:
+  enabled: false
+  source_id: weather.open_meteo
+  provider: open_meteo
+  latitude: null
+  longitude: null
+  timezone: auto
+  refresh_seconds: 600
+  timeout_seconds: 1.5
+  failures_before_open: 3
+  circuit_open_seconds: 600
+  cache_ttl_seconds: 1800
+sensors:
+  stale_after_seconds: 5
+  accepted_sources:
+    heart_rate: [sensor.heart_rate]
+    motion: [sensor.motion]
+    light: [sensor.light]
+    posture: [sensor.posture]
+simulator:
+  interval_seconds: 0.5
+osc:
+  enabled: true
+  host: 0.0.0.0
+  port: 8002

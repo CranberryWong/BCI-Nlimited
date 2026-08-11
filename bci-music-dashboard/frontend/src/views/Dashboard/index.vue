@@ -17,6 +17,10 @@
           <template #icon><n-icon><SlidersHorizontal /></n-icon></template>
           Music Config
         </n-button>
+        <n-button @click="adaptiveConfigOpen = true">
+          <template #icon><n-icon><Network /></n-icon></template>
+          Adaptive Config
+        </n-button>
       </div>
     </header>
     <EmotionMonitor
@@ -27,6 +31,15 @@
       @stop-simulator="run(emotion.stopSimulator)"
       @start-model="run(emotion.startModel)"
       @stop-model="run(emotion.stopModel)"
+    />
+    <RuntimeConsole
+      :status="adaptive.status"
+      :logs="adaptive.logs"
+      @start="run(adaptive.start)"
+      @stop="run(adaptive.stop)"
+      @diagnostics="run(adaptive.runDiagnostics)"
+      @start-simulator="run(adaptive.startAuxiliarySimulator)"
+      @stop-simulator="run(adaptive.stopAuxiliarySimulator)"
     />
     <MusicGeneratorPanel
       :status="emotion.generator"
@@ -55,11 +68,17 @@
     <TrackEditor :track="selected" :config="tracks.config" @close="selected = null" @save="saveTrack" @reset="resetTrack" />
     <UsageHelpDrawer v-model:show="helpOpen" />
     <MusicConfigDrawer v-model:show="configOpen" :config="tracks.config" @apply="applyConfig" @reset="run(tracks.resetConfig)" @loaded="loadedConfig" />
+    <AdaptiveConfigDrawer
+      v-model:show="adaptiveConfigOpen"
+      :locked="Boolean(adaptive.status?.config_locked)"
+      :modules="adaptive.modules"
+      @save="saveAdaptiveConfig"
+    />
   </main>
 </template>
 
 <script setup lang="ts">
-import { BookOpenText, SlidersHorizontal } from 'lucide-vue-next';
+import { BookOpenText, Network, SlidersHorizontal } from 'lucide-vue-next';
 import { isAxiosError } from 'axios';
 import { NButton, NDataTable, NIcon, useMessage, type DataTableColumns } from 'naive-ui';
 import { onMounted, ref } from 'vue';
@@ -67,6 +86,7 @@ import type { MusicConfig, MusicEvent, TrackConfig } from '../../types';
 import { useEmotionStore } from '../../stores/emotion';
 import { useOutputsStore } from '../../stores/outputs';
 import { useTracksStore } from '../../stores/tracks';
+import { useAdaptiveStore } from '../../stores/adaptive';
 import { APP_VERSION } from '../../version';
 import EmotionMonitor from './EmotionMonitor.vue';
 import MusicConfigDrawer from './MusicConfigDrawer.vue';
@@ -76,14 +96,18 @@ import SessionRecorder from './SessionRecorder.vue';
 import TrackEditor from './TrackEditor.vue';
 import TrackList from './TrackList.vue';
 import UsageHelpDrawer from './UsageHelpDrawer.vue';
+import AdaptiveConfigDrawer from './AdaptiveConfigDrawer.vue';
+import RuntimeConsole from './RuntimeConsole.vue';
 
 const emotion = useEmotionStore();
 const tracks = useTracksStore();
 const outputs = useOutputsStore();
+const adaptive = useAdaptiveStore();
 const message = useMessage();
 const selected = ref<TrackConfig | null>(null);
 const configOpen = ref(false);
 const helpOpen = ref(false);
+const adaptiveConfigOpen = ref(false);
 const eventColumns: DataTableColumns<MusicEvent> = [
   { title: 'Time', key: 'timestamp', render: (row) => new Date(row.timestamp * 1000).toLocaleTimeString() },
   { title: 'Track', key: 'track_id' },
@@ -114,8 +138,11 @@ function loadedConfig(config: MusicConfig) {
   tracks.config = config;
   tracks.tracks = config.default_tracks;
 }
+async function saveAdaptiveConfig(module: string, config: Record<string, unknown>) {
+  await run(() => adaptive.saveModule(module, config));
+}
 onMounted(async () => {
-  await Promise.all([emotion.init(), tracks.loadConfig(), outputs.loadMidi()]);
+  await Promise.all([emotion.init(), adaptive.init(), tracks.loadConfig(), outputs.loadMidi()]);
 });
 </script>
 

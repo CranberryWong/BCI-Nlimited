@@ -45,6 +45,19 @@ python run.py --check --midi-port 'IAC Driver Bus 1'
 
 ## 3. 运行
 
+Dashboard 正式运行时会自动管理仅监听 localhost 的工作进程：
+
+```bash
+python run_worker.py --host 127.0.0.1 --port 8766 --model mrt2_small
+```
+
+它使用 v1 WebSocket 协议接收逐帧 128 音高 pianoroll、编译后的马林巴提示词、
+音频增益和可选 Stem；返回单旋律转录事件及帧耗时指标。主 Dashboard 负责最终
+音域/调式/强拍/最短音长护栏、规范 MIDI、OSC 分发和故障切换。工作进程退出或
+模型不可用时，Transport 不停止，下一乐句从当前动机位置规则续演。
+
+以下命令仍可单独运行原型：
+
 交互输入提示词并运行 30 秒：
 
 ```bash
@@ -91,4 +104,3 @@ python run.py --no-play-audio
 ```bash
 pytest -q
 ```
-

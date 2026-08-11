@@ -264,3 +264,71 @@ export interface EmotionProfile {
   tension: number;
   [key: string]: string | number | number[] | boolean;
 }
+
+export interface InputSourceStatus {
+  source_id: string;
+  kind: string;
+  health: string;
+  quality: number;
+  age_seconds: number | null;
+  last_sequence: number | null;
+  detail?: string;
+}
+
+export interface ContextFrame {
+  timestamp: number;
+  valence: number;
+  arousal: number;
+  bci_confidence: number;
+  heart_rate: number | null;
+  motion: number | null;
+  ambient_light: number | null;
+  degraded: boolean;
+}
+
+export interface AdaptiveIntent {
+  valence: number;
+  energy: number;
+  tension: number;
+  density: number;
+  brightness: number;
+  pulse: number;
+  complexity: number;
+  register_band: string;
+  articulation: string;
+  spatial_width: number;
+  transition_urgency: number;
+  frozen_motif: boolean;
+}
+
+export interface RuntimeLogEntry {
+  sequence: number;
+  timestamp: number;
+  level: string;
+  category: string;
+  message: string;
+  data: Record<string, unknown>;
+}
+
+export interface AdaptiveRuntimeStatus {
+  running: boolean;
+  session_id: string | null;
+  config_locked: boolean;
+  started_at: number | null;
+  transport: { running: boolean; bpm: number; bar: number; beat: number; phase: number };
+  context: ContextFrame | null;
+  intent: AdaptiveIntent | null;
+  form: { section_id: string; role: string; section_index: number; phrase_index: number; phrase_in_section: number; section_count: number; is_final: boolean };
+  tonal: Record<string, unknown> | null;
+  motif: Record<string, unknown> | null;
+  harmony: Record<string, unknown> | null;
+  orchestration: Record<string, unknown> | null;
+  prompt: string;
+  magenta: { connected: boolean; detail: string; failures: number; health: Record<string, unknown>; url: string };
+  fallback_count: number;
+  outputs: Record<string, unknown>;
+  inputs: InputSourceStatus[];
+  sensor_osc: { running: boolean; host: string; port: number; detail: string };
+  auxiliary_simulator: { running: boolean };
+  recent_logs: RuntimeLogEntry[];
+}

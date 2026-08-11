@@ -22,6 +22,7 @@ import { h, onMounted, ref } from 'vue';
 import { api } from '../../api/client';
 
 type Session = { id: string; files: string[] };
+type ExportItem = { file?: string; label?: string; format: string; match?: (files: string[]) => boolean };
 const active = ref<string | null>(null);
 const sessions = ref<Session[]>([]);
 async function start() {
@@ -41,19 +42,23 @@ const columns: DataTableColumns<Session> = [
     title: 'Export',
     key: 'actions',
     render: (row) => h('div', { class: 'file-actions' }, exports
-      .filter((item) => row.files.includes(item.file))
+      .filter((item) => item.match ? item.match(row.files) : row.files.includes(item.file || ''))
       .map((item) => h(NButton, {
         size: 'small',
         tag: 'a',
         href: `/api/sessions/${row.id}/download?format=${item.format}`,
-      }, { default: () => item.file }))),
+      }, { default: () => item.label || item.file }))),
   },
 ];
-const exports = [
+const exports: ExportItem[] = [
   { file: 'music.mid', format: 'mid' },
   { file: 'emotion.csv', format: 'csv' },
   { file: 'emotion_timeline.jsonl', format: 'emotion-jsonl' },
   { file: 'music_event_log.jsonl', format: 'music-jsonl' },
+  { file: 'runtime_event_log.jsonl', format: 'runtime-log' },
+  { file: 'adaptive_summary.json', format: 'summary' },
+  { label: 'Magenta WAV', format: 'wav', match: (files: string[]) => files.some((file) => file.startsWith('magenta/') && file.endsWith('.wav')) },
+  { label: 'Magenta MIDI', format: 'magenta-midi', match: (files: string[]) => files.some((file) => file.startsWith('magenta/') && file.endsWith('.mid')) },
   { file: 'music_config_snapshot.yaml', format: 'config' },
   { file: 'music_segments.jsonl', format: 'segments' },
   { file: 'generator_status.json', format: 'generator-status' },

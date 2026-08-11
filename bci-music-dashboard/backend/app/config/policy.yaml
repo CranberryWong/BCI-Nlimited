@@ -1,0 +1,15 @@
+update_hz: 10
+weights:
+  energy: {bci_arousal: 0.70, heart_rate: 0.15, motion: 0.10, circadian: 0.05}
+  pulse: {bci_arousal: 0.60, cadence: 0.25, heart_rate: 0.15}
+  brightness: {bci_valence: 0.75, daylight: 0.15, weather: 0.10}
+  spatial_width: {motion: 0.35, posture_expansion: 0.35, baseline: 0.30}
+smoothing:
+  attack_seconds: 2.0
+  release_seconds: 6.0
+  deadband: 0.03
+confidence:
+  freeze_motif_below: 0.45
+  full_variation_above: 0.75
+limits:
+  auxiliary_max_contribution: 0.30

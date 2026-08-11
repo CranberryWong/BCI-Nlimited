@@ -64,6 +64,20 @@ class Settings(BaseSettings):
         return BACKEND_DIR / "app" / "config" / "music_defaults.yaml"
 
     @property
+    def adaptive_config_dir(self) -> Path:
+        return BACKEND_DIR / "app" / "config"
+
+    @property
+    def magenta_flow_dir(self) -> Path:
+        return PROJECT_DIR.parent / "magenta-flow"
+
+    @property
+    def magenta_worker_command(self) -> list[str]:
+        root = self.magenta_flow_dir
+        interpreter = root / ".venv" / "bin" / "python"
+        return [str(interpreter), str(root / "run_worker.py")]
+
+    @property
     def resolved_music_library_path(self) -> Path:
         candidate = Path(self.music_library_path).expanduser()
         return candidate if candidate.is_absolute() else (PROJECT_DIR / candidate).resolve()

@@ -1,0 +1,26 @@
+mode: both
+midi:
+  enabled: true
+  port_contains: IAC
+  channels:
+    marimba: 1
+    harmony: 2
+    bass: 3
+    pad: 5
+    fx: 6
+    kick: 10
+    snare: 10
+    cymbal: 11
+osc:
+  enabled: true
+  targets:
+    - {id: touchdesigner, host: 127.0.0.1, port: 9000, enabled: true}
+  state_hz: 30
+audio:
+  enabled: true
+  sample_rate: 48000
+  output_device: null
+  master_gain: 0.65
+logging:
+  ring_size: 500
+  persist_jsonl: true

@@ -1,0 +1,19 @@
+bars: 2
+beats_per_bar: 4
+base_pitch: 60
+allowed_subdivisions: [0.25, 0.5, 1.0]
+contours:
+  low_valence: descending
+  neutral: wave
+  high_valence: ascending
+anchors:
+  beats: [0, 4, 7]
+  immutable: true
+transform_by_form:
+  intro: simplify
+  identity: identity
+  contrast: transpose
+  development: invert
+  climax: compress
+  return: recall
+  coda: cadence

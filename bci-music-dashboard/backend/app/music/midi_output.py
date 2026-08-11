@@ -20,6 +20,19 @@ class MidiStatus:
 class MidiOutput:
     def __init__(self) -> None:
         self._port = None
+        self.preferred_port = ""
+        self.status = self._probe()
+
+    def configure(self, preferred_port: str = "") -> None:
+        if preferred_port == self.preferred_port:
+            return
+        if self._port is not None:
+            try:
+                self._port.close()
+            except Exception:
+                pass
+        self._port = None
+        self.preferred_port = preferred_port
         self.status = self._probe()
 
     def list_ports(self) -> MidiStatus:
@@ -70,7 +83,8 @@ class MidiOutput:
             return None
         if self._port is None and self.status.ports:
             try:
-                self._port = mido.open_output(self.status.ports[0])
+                matches = [name for name in self.status.ports if self.preferred_port.lower() in name.lower()]
+                self._port = mido.open_output(matches[0] if matches else self.status.ports[0])
             except Exception as exc:
                 self.status = MidiStatus("mock", [], str(exc))
         return self._port

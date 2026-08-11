@@ -1,0 +1,19 @@
+provider: magenta_rt2
+model: mrt2_small
+worker_url: ws://127.0.0.1:8766/v1/stream
+frame_hz: 25
+prompt_template: "{mood} {energy} solo marimba improvisation, single clear notes, {articulation} articulation"
+transcription:
+  pitch_range: [48, 96]
+  stable_frames: 2
+  minimum_note_ms: 80
+guardrails:
+  scale_snap: true
+  strong_beat_chord_snap: true
+  octave_suppression: true
+  soft_grid: 1/16
+  snap_tolerance_ms: 45
+fallback: motif_rule_continuation
+audio:
+  enabled: true
+  gain: 0.20

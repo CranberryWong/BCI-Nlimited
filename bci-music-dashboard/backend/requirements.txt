@@ -11,3 +11,4 @@ joblib>=1.4,<2
 numpy>=1.26,<3
 PyYAML>=6,<7
 python-multipart>=0.0.9,<1
+websockets>=12,<17

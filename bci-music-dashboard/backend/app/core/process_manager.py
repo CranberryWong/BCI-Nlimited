@@ -18,6 +18,7 @@ from app.music.generation.presets_testing import PresetsTestingRuntime
 from app.music.generation.noto_testing import NotoTestingRuntime
 from app.music.recorder import SessionRecorder
 from app.music.schemas import EmotionState, MusicEvent
+from app.adaptive.runtime import AdaptivePerformanceRuntime
 
 
 class ProcessManager:
@@ -31,6 +32,7 @@ class ProcessManager:
         music_generator: MusicGenerationRuntime,
         presets_testing: PresetsTestingRuntime,
         noto_testing: NotoTestingRuntime,
+        adaptive: AdaptivePerformanceRuntime,
     ) -> None:
         self.settings = settings
         self.websocket = websocket
@@ -40,6 +42,7 @@ class ProcessManager:
         self.music_generator = music_generator
         self.presets_testing = presets_testing
         self.noto_testing = noto_testing
+        self.adaptive = adaptive
         self.mapper = EmotionMapper()
         self.loop: asyncio.AbstractEventLoop | None = None
         self.latest_emotion: EmotionState | None = None
@@ -69,6 +72,12 @@ class ProcessManager:
 
     async def process_payload(self, valence: float, arousal: float, prob0: float, prob1: float, source: str) -> None:
         emotion = self.mapper.from_tuple(valence, arousal, prob0, prob1, source=source)
+        self.adaptive.ingest_bci(
+            emotion.valence_norm,
+            emotion.arousal_norm,
+            emotion.confidence,
+            source=source,
+        )
         self.music_generator.add_emotion(emotion)
         self.presets_testing.add_emotion(emotion)
         self.noto_testing.add_emotion(emotion)
@@ -100,6 +109,7 @@ class ProcessManager:
             "music_generator": self.music_generator.status(),
             "presets_testing": self.presets_testing.status(),
             "noto_testing": self.noto_testing.status(),
+            "adaptive_performance": self.adaptive.status(),
         }
 
     def start_model(self) -> dict[str, Any]:

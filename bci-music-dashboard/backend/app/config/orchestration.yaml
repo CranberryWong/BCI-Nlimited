@@ -1,0 +1,15 @@
+roles:
+  marimba: {enabled: true, base_density: 0.75, base_velocity: 82}
+  snare: {enabled: true, base_density: 0.30, base_velocity: 72, note: 38}
+  cymbal: {enabled: true, base_density: 0.18, base_velocity: 65, note: 49}
+  kick: {enabled: true, base_density: 0.28, base_velocity: 78, note: 36}
+  bass: {enabled: true, base_density: 0.35, base_velocity: 68}
+  pad: {enabled: true, base_density: 0.20, base_velocity: 48}
+  fx: {enabled: true, base_density: 0.10, base_velocity: 42}
+independent_patterns: true
+shared_subdivisions: [1/4, 1/8, 1/16]
+stems:
+  enabled: true
+  root: music_library/stems
+  crossfade_seconds: 4
+  default_gain: 0.15

@@ -47,6 +47,7 @@ class MusicGeneratorRuntimeTest(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_missing_model_keeps_theme_and_limits_bpm_step(self) -> None:
+        self.runtime.config = self.runtime.config.model_copy(update={"composition_mode": "theme"})
         mapper = EmotionMapper()
         for _ in range(4):
             self.runtime.add_emotion(mapper.from_tuple(9, 9, 0.9, 0.1, source="simulator"))
@@ -328,6 +329,7 @@ class MusicGeneratorRuntimeTest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(note.notochord_eligible for note in bass_notes))
 
     async def test_invalid_model_revoice_keeps_rule_polyphony(self) -> None:
+        self.runtime.config = self.runtime.config.model_copy(update={"composition_mode": "theme"})
         self.runtime.current_theme = self.theme_library.select("ode_to_joy")
         self.runtime.model.model = object()
         self.runtime.model.active_provider = "notochord"

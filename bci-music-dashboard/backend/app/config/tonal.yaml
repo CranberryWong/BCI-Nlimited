@@ -1,0 +1,15 @@
+default_root: C
+positive_scale: gong
+negative_scale: yu
+neutral_scale: shang
+allowed_roots: [C, D, E, F, G, A]
+melody_range: [48, 84]
+strong_beat_degrees: [0, 2, 4]
+scales:
+  gong: [0, 2, 4, 7, 9]
+  shang: [0, 2, 5, 7, 10]
+  jue: [0, 3, 5, 8, 10]
+  zhi: [0, 2, 5, 7, 9]
+  yu: [0, 3, 5, 7, 10]
+  major: [0, 2, 4, 5, 7, 9, 11]
+  minor: [0, 2, 3, 5, 7, 8, 10]

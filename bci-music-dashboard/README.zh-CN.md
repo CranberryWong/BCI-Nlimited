@@ -4,6 +4,25 @@
 `[valence, arousal, prob0, prob1]` 四元组，映射为情绪状态，并进一步生成旋律、和声、
 低音、鼓点、镲片、Pad 与控制事件，输出到 OSC 或 MIDI，同时保存可复现实验记录。
 
+## 自适应演出运行时
+
+当前主运行方式为 `adaptive_performance`：BCI 负责效价、唤醒度与张力的核心判断；
+时间、Open-Meteo 天气、心率、运动、光线和体态只做有上限的辅助调制。`ContextHub`
+将输入统一为 `ContextFrame`，YAML `PolicyEngine` 编译为连续 `MusicIntent`，再由调式、
+曲式、动机、和声/二声部对位、MRT2 马林巴旋律和配器模块分别处理。所有声音共享一个
+Transport，但打击乐保持独立型态与密度，不逐音跟随旋律。
+
+- Dashboard 的 `Adaptive Config` 可编辑九个模块化 YAML；开始演出后快照锁定。
+- MRT2 是 localhost 独立进程；失效时从当前动机规则续演，不停止音乐时钟。
+- Notochord 只提供和声、低音和内声候选，200ms 超时后立即使用规则和声。
+- MIDI 设备、角色 Channel Map、TouchDesigner OSC 目标和 Audio 总线集中在
+  `backend/app/config/outputs.yaml`，不再按配器分别配置 IP/端口。
+- Runtime Console 统一显示输入新鲜度、Context/Intent、曲式、模型状态、输出与日志。
+
+主要接口为 `/api/inputs/status`、`/api/config/{module}`、
+`/api/performance/start|stop`、`/api/runtime/status` 和 `/api/diagnostics/run`。
+WebSocket 统一信封为 `{version,type,seq,timestamp,session_id,payload}`。
+
 ## 项目结构
 
 - `backend/app/bci`：OSC 输入、模拟器、XDF 监听、模型推理与情绪映射。
@@ -81,9 +100,10 @@ XDF 文件的目录。
 然后刷新 `GET /api/outputs/midi-ports`，把目标音轨设置为 MIDI 输出，并把输出模式设为
 包含 MIDI 的模式。没有 MIDI 设备时，系统会进入 mock mode，不会崩溃。
 
-## Docker Compose
+## Docker Compose（规则降级模式）
 
-推荐在目标台式机部署时使用 Docker。容器结构为：
+正式演出环境为 Apple Silicon Mac 原生进程；Docker/Windows 用于开发或无 MRT2 的
+规则降级运行。容器结构为：
 
 - `frontend`：Vue 生产构建，由 Nginx 提供页面，并代理 `/api` 与 `/ws`。
 - `backend`：FastAPI、OSC 输入、模型推理与音乐引擎。

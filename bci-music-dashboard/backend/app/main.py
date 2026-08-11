@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+import time
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import routes_control, routes_music, routes_outputs, routes_sessions, routes_tracks
+from app.api import routes_adaptive, routes_control, routes_music, routes_outputs, routes_sessions, routes_tracks
+from app.adaptive.config import AdaptiveConfigStore
+from app.adaptive.outputs import OutputHub
+from app.adaptive.notochord import NotochordHarmonyCandidateProvider
+from app.adaptive.runtime import AdaptivePerformanceRuntime
 from app.core.config import get_settings
 from app.core.process_manager import ProcessManager
 from app.core.websocket_manager import WebSocketManager
@@ -37,6 +42,11 @@ async def lifespan(app: FastAPI):
     app.state.recorder = SessionRecorder(settings.session_dir)
     app.state.presets = PresetStore(settings.preset_dir)
     app.state.engine = MusicEngine(app.state.config_store.active_config, app.state.midi, app.state.osc)
+    app.state.adaptive_config = AdaptiveConfigStore(settings.adaptive_config_dir)
+    app.state.legacy_migration = app.state.adaptive_config.merge_legacy(
+        app.state.config_store.active_config.model_dump()
+    )
+    app.state.output_hub = OutputHub(app.state.adaptive_config.get("outputs"), app.state.midi)
     app.state.melody_model = MelodyModel(
         settings.resolved_music_model_path,
         settings.resolved_music_model_config_path,
@@ -86,6 +96,17 @@ async def lifespan(app: FastAPI):
         app.state.portrait_library, app.state.config_store.active_config,
         app.state.melody_model, dispatch, app.state.engine.all_notes_off, app.state.websocket.broadcast,
     )
+    app.state.adaptive = AdaptivePerformanceRuntime(
+        app.state.adaptive_config,
+        app.state.output_hub,
+        app.state.recorder,
+        app.state.websocket.broadcast,
+        NotochordHarmonyCandidateProvider(app.state.melody_model),
+        settings.resolved_music_library_path / "stems",
+        magenta_command=settings.magenta_worker_command,
+        magenta_cwd=settings.magenta_flow_dir,
+    )
+    app.state.adaptive.legacy_migration = app.state.legacy_migration
     app.state.runtime = ProcessManager(
         settings,
         app.state.websocket,
@@ -95,11 +116,14 @@ async def lifespan(app: FastAPI):
         app.state.music_generator,
         app.state.presets_testing,
         app.state.noto_testing,
+        app.state.adaptive,
     )
     runtime_holder["runtime"] = app.state.runtime
     app.state.recorder.set_model_metadata(app.state.melody_model.public_metadata())
     await app.state.runtime.startup()
+    await app.state.adaptive.startup()
     yield
+    await app.state.adaptive.shutdown()
     await app.state.runtime.shutdown()
 
 
@@ -116,6 +140,7 @@ app.include_router(routes_tracks.router)
 app.include_router(routes_outputs.router)
 app.include_router(routes_sessions.router)
 app.include_router(routes_music.router)
+app.include_router(routes_adaptive.router)
 
 
 @app.get("/api/health")
@@ -127,6 +152,14 @@ def health():
 async def realtime(websocket: WebSocket):
     await websocket.app.state.websocket.connect(websocket)
     await websocket.send_json({"kind": "status", "status": websocket.app.state.runtime.status()})
+    await websocket.send_json({
+        "version": "v1",
+        "type": "status",
+        "seq": 0,
+        "timestamp": time.time(),
+        "session_id": websocket.app.state.adaptive.session_id or None,
+        "payload": {"status": websocket.app.state.adaptive.status()},
+    })
     try:
         while True:
             await websocket.receive_text()
