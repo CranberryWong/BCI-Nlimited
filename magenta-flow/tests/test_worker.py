@@ -1,9 +1,10 @@
 from pathlib import Path
 
 import numpy as np
+import pytest
 import soundfile as sf
 
-from magenta_flow.worker import StemLoopMixer, WorkerControl
+from magenta_flow.worker import StemLoopMixer, WorkerControl, transcriber_config_from_payload
 
 
 def test_stem_loop_mixer_crossfades_and_limits(tmp_path: Path):
@@ -29,3 +30,20 @@ def test_worker_control_defaults_to_low_gain_optional_audio():
     assert control.audio_enabled
     assert control.audio_gain == 0.2
     assert control.stem_gain == 0.0
+
+
+def test_transcription_payload_configures_worker_transcriber():
+    config = transcriber_config_from_payload({
+        "pitch_range": [55, 84],
+        "stable_frames": 4,
+        "minimum_note_ms": 120,
+    })
+    assert (config.fmin_midi, config.fmax_midi) == (55, 84)
+    assert config.stable_frames == 4
+    assert config.minimum_note_seconds == pytest.approx(0.12)
+    assert config.min_retrigger_seconds == pytest.approx(0.12)
+
+
+def test_transcription_payload_rejects_reversed_range():
+    with pytest.raises(ValueError, match="ascending"):
+        transcriber_config_from_payload({"pitch_range": [84, 55]})

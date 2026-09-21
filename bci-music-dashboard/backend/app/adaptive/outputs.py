@@ -87,7 +87,16 @@ class OutputHub:
         self._osc("/v1/music/harmony", [sequence, time.time(), root, scale, harmony.chords[0] if harmony.chords else "", harmony.roots[0] if harmony.roots else 0])
 
     def send_section(self, sequence: int, form: FormState, changed: bool) -> None:
-        self._osc("/v1/music/section", [sequence, time.time(), form.section_id, form.role, form.phrase_index, form.phrase_in_section, int(changed)])
+        self._osc("/v1/music/section", [
+            sequence,
+            time.time(),
+            form.section_id,
+            form.role,
+            form.phrase_index,
+            form.phrase_in_section,
+            int(changed),
+            int(form.completed),
+        ])
 
     def send_health(self, sequence: int, running: bool, model_status: str, fallback_count: int) -> None:
         self._osc("/v1/music/health", [sequence, time.time(), int(running), model_status, fallback_count, self.errors])

@@ -35,6 +35,36 @@ class AdaptiveConfigLegacyTest(unittest.TestCase):
             persisted = yaml.safe_load((root / "melody.yaml").read_text())
             self.assertEqual(persisted["audio"]["gain"], 0.1)
 
+            invalid_form = store.get("form")
+            invalid_form["maximum_phrases_per_section"] = 1
+            with self.assertRaisesRegex(ValueError, "maximum_phrases_per_section"):
+                store.replace("form", invalid_form)
+
+            invalid_form = store.get("form")
+            invalid_form["transitions"]["A1"] = ["coda"]
+            with self.assertRaisesRegex(ValueError, "next section"):
+                store.replace("form", invalid_form)
+
+            invalid_motif = store.get("motif")
+            invalid_motif["valence_thresholds"] = {"low_below": 0.8, "high_above": 0.2}
+            with self.assertRaisesRegex(ValueError, "valence thresholds"):
+                store.replace("motif", invalid_motif)
+
+            invalid_motif = store.get("motif")
+            invalid_motif["anchors"]["beats"] = [8]
+            with self.assertRaisesRegex(ValueError, "anchor beats"):
+                store.replace("motif", invalid_motif)
+
+            invalid_melody = store.get("melody")
+            invalid_melody["prompt_template"] = "{mood} {unknown} marimba"
+            with self.assertRaisesRegex(ValueError, "unknown melody prompt fields"):
+                store.replace("melody", invalid_melody)
+
+            invalid_melody = store.get("melody")
+            invalid_melody["guardrails"]["soft_grid"] = "1/32"
+            with self.assertRaisesRegex(ValueError, "soft_grid"):
+                store.replace("melody", invalid_melody)
+
     def test_legacy_track_endpoints_become_disabled_central_targets(self):
         store = AdaptiveConfigStore(CONFIG_DIR)
         adaptive = store.all()

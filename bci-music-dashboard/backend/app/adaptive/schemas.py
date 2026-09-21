@@ -90,6 +90,7 @@ class FormState(BaseModel):
     emotion_changes_used: int = 0
     emotion_change_budget: int = 3
     is_final: bool = False
+    completed: bool = False
 
 
 class MotifNote(BaseModel):
@@ -115,8 +116,11 @@ class HarmonyPlan(BaseModel):
     chords: list[str] = Field(default_factory=list)
     roots: list[int] = Field(default_factory=list)
     bass_pitches: list[int] = Field(default_factory=list)
+    pad_voicings: list[list[int]] = Field(default_factory=list)
+    inner_pitches: list[int] = Field(default_factory=list)
     counterpoint: list[MotifNote] = Field(default_factory=list)
     provider: Literal["rule", "notochord"] = "rule"
+    notochord_roles: list[str] = Field(default_factory=list)
     fallback_reason: str = ""
 
 

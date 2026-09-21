@@ -34,6 +34,25 @@ def test_tracker_orders_note_off_before_pitch_change_note_on():
     ]
 
 
+def test_tracker_holds_active_note_until_configured_minimum_duration():
+    config = TranscriberConfig(stable_frames=1, minimum_note_seconds=0.12)
+    tracker = MonophonicEventTracker(config)
+    assert [(event.kind, event.note) for event in tracker.process(observation(69), 0.00)] == [("note_on", 69)]
+    assert tracker.process(observation(72), 0.04) == []
+    changed = tracker.process(observation(72), 0.12)
+    assert [(event.kind, event.note) for event in changed] == [("note_off", 69), ("note_on", 72)]
+
+
+def test_tracker_holds_note_through_early_silence_until_minimum_duration():
+    config = TranscriberConfig(stable_frames=1, silence_frames=2, minimum_note_seconds=0.12)
+    tracker = MonophonicEventTracker(config)
+    tracker.process(observation(69), 0.00)
+    assert tracker.process(observation(None, db=-80), 0.04) == []
+    assert tracker.process(observation(None, db=-80), 0.08) == []
+    stopped = tracker.process(observation(None, db=-80), 0.12)
+    assert [(event.kind, event.note) for event in stopped] == [("note_off", 69)]
+
+
 def test_tracker_retriggers_same_marimba_note_without_overlap():
     tracker = MonophonicEventTracker(TranscriberConfig())
     tracker.process(observation(69), 0.00)

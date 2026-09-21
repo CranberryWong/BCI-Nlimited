@@ -21,6 +21,7 @@
         <strong>{{ Math.round(status?.transport.bpm || 0) }} BPM</strong>
         <span>Bar {{ status?.transport.bar || 1 }} · Beat {{ (status?.transport.beat || 1).toFixed(2) }}</span>
         <span>Section {{ status?.form.section_id || 'Intro' }} · Phrase {{ status?.form.phrase_index || 0 }}</span>
+        <span v-if="status?.form.completed">曲式已完成</span>
         <span>Session {{ status?.session_id || '—' }}</span>
       </article>
 

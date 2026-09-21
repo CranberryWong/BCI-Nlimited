@@ -43,6 +43,7 @@ class TranscriberConfig:
     stable_frames: int = 2
     silence_frames: int = 2
     min_retrigger_seconds: float = 0.08
+    minimum_note_seconds: float = 0.08
     onset_flux_floor: float = 0.025
     onset_rms_rise_db: float = 2.5
 
@@ -79,6 +80,7 @@ class MonophonicEventTracker:
             if (
                 self.active_note is not None
                 and self._silence_count >= self.config.silence_frames
+                and timestamp - self._last_trigger_time + 1e-9 >= self.config.minimum_note_seconds
             ):
                 events.append(self._note_off(self.active_note, timestamp))
                 self.active_note = None
@@ -102,6 +104,8 @@ class MonophonicEventTracker:
             return events
 
         if note != self.active_note:
+            if timestamp - self._last_trigger_time + 1e-9 < self.config.minimum_note_seconds:
+                return events
             events.append(self._note_off(self.active_note, timestamp))
             events.append(self._note_on(note, observation, timestamp))
             self.active_note = note
@@ -288,4 +292,3 @@ class StreamingMonophonicTranscriber:
             if recent[0] == recent[1]:
                 return recent[1]
         return note
-

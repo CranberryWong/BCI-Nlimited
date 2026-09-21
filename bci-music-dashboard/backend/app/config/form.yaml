@@ -2,6 +2,7 @@ template: adaptive_rondo
 beats_per_bar: 4
 phrase_bars: 2
 minimum_phrases_per_section: 2
+maximum_phrases_per_section: 4
 emotion_change_budget: 3
 slow_window_seconds: 16
 fast_window_seconds: 4

@@ -18,10 +18,20 @@ Transport，但打击乐保持独立型态与密度，不逐音跟随旋律。
 - MIDI 设备、角色 Channel Map、TouchDesigner OSC 目标和 Audio 总线集中在
   `backend/app/config/outputs.yaml`，不再按配器分别配置 IP/端口。
 - Runtime Console 统一显示输入新鲜度、Context/Intent、曲式、模型状态、输出与日志。
+- 当前前端默认屏蔽旧 Portrait Generator、逐音轨编辑器、旧输出面板和旧事件表。
+  如迁移期间需要临时查看，可在 `frontend/.env.local` 设置
+  `VITE_SHOW_LEGACY_UI=true` 后重启前端。
 
 主要接口为 `/api/inputs/status`、`/api/config/{module}`、
 `/api/performance/start|stop`、`/api/runtime/status` 和 `/api/diagnostics/run`。
 WebSocket 统一信封为 `{version,type,seq,timestamp,session_id,payload}`。
+
+曲式始终按 `sections` 顺序完整遍历。每段至少演奏 2 个乐句；只有当信号置信度和
+转场紧迫度同时达到 `transition_confidence` 且仍有情绪变化预算时，才会在最短边界
+提前转场。否则最多停留到 `maximum_phrases_per_section`，再进行不消耗情绪预算的
+结构性转场。Coda 完成规定乐句后输出 `performance_completed` 并自动停止演出。
+`/v1/music/section` 依次输出
+`sequence, timestamp, section_id, role, phrase_index, phrase_in_section, changed, completed`。
 
 ## 项目结构
 
@@ -33,7 +43,7 @@ WebSocket 统一信封为 `{version,type,seq,timestamp,session_id,payload}`。
 
 ## 模型文件
 
-请将情绪模型文件放到：
+情绪识别模型与 Google Magenta RealTime 2 音乐模型是两套文件。请将情绪模型放到：
 
 ```text
 models/mlp_valence_model.pkl
@@ -42,6 +52,15 @@ models/mlp_valence_model.pkl
 默认 `MODEL_PATH` 为 `models/mlp_valence_model.pkl`。也可以在 `.env` 中改为绝对路径。
 如果模型缺失，后端仍可启动，Dashboard 会显示 `model_missing`，模拟器仍可使用；
 点击 `Start Model` 时会返回明确错误。
+
+### Google Magenta RealTime 2 音乐模型
+
+Apple Silicon Mac 上的 MRT2 马林巴旋律使用 `mrt2_small`，在本机推理，无需
+Gemini API key。先按 [Magenta Flow 安装说明](../magenta-flow/README.md#1-安装与下载-google-模型)
+建立独立 Python 环境，通过官方 `mrt models init` 和 `mrt models download`
+下载模型。默认资源目录是 `~/Documents/Magenta/magenta-rt-v2/`，模型权重不放进
+Git 仓库。启动 `Start Performance` 后，Dashboard 会自动启动本机工作进程；
+Windows 和 Docker 使用动机规则旋律。
 
 ## 本地启动
 

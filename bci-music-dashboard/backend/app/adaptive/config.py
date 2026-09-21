@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from pathlib import Path
+from string import Formatter
 from typing import Any
 from urllib.parse import urlparse
 
@@ -116,16 +117,39 @@ class AdaptiveConfigStore:
 
         form = config["form"]
         sections = form.get("sections", [])
-        if not sections or int(form.get("minimum_phrases_per_section", 0)) < 2:
+        minimum_phrases = int(form.get("minimum_phrases_per_section", 0))
+        maximum_phrases = int(form.get("maximum_phrases_per_section", 0))
+        if not sections or minimum_phrases < 2:
             raise ValueError("form requires sections and at least two phrases per section")
+        if maximum_phrases < minimum_phrases:
+            raise ValueError("form maximum_phrases_per_section must be at least the minimum")
+        transition_confidence = float(form.get("transition_confidence", -1))
+        if not 0.0 <= transition_confidence <= 1.0:
+            raise ValueError("form transition_confidence must be between 0 and 1")
         ids = [str(section.get("id", "")) for section in sections]
         if not all(ids) or len(ids) != len(set(ids)):
             raise ValueError("form section ids must be non-empty and unique")
+        roles = {"intro", "identity", "contrast", "development", "climax", "return", "coda"}
+        invalid_roles = [str(section.get("role", "")) for section in sections if section.get("role") not in roles]
+        if invalid_roles:
+            raise ValueError(f"unknown form roles: {sorted(set(invalid_roles))}")
+        transitions = form.get("transitions", {})
+        if set(transitions) != set(ids):
+            raise ValueError("form transitions must define every section id exactly once")
         unknown_targets = {
-            target for targets in form.get("transitions", {}).values() for target in targets if target not in ids
+            target for targets in transitions.values() for target in targets if target not in ids
         }
         if unknown_targets:
             raise ValueError(f"unknown form transition targets: {sorted(unknown_targets)}")
+        for index, section_id in enumerate(ids[:-1]):
+            next_id = ids[index + 1]
+            targets = set(transitions[section_id])
+            if next_id not in targets or targets - {section_id, next_id}:
+                raise ValueError(
+                    f"form transition {section_id} must allow only itself and the next section {next_id}"
+                )
+        if transitions[ids[-1]]:
+            raise ValueError("the final form section must have no outgoing transitions")
 
         tonal = config["tonal"]
         low, high = tonal.get("melody_range", [48, 84])
@@ -135,18 +159,115 @@ class AdaptiveConfigStore:
             if name not in tonal.get("scales", {}):
                 raise ValueError(f"unknown tonal scale: {name}")
 
-        if int(config["motif"].get("beats_per_bar", 4)) != int(form.get("beats_per_bar", 4)):
+        motif = config["motif"]
+        motif_bars = int(motif.get("bars", 0))
+        motif_beats_per_bar = int(motif.get("beats_per_bar", 0))
+        if not 1 <= motif_bars <= 4 or not 1 <= motif_beats_per_bar <= 12:
+            raise ValueError("motif bars and beats_per_bar are out of range")
+        if motif_beats_per_bar != int(form.get("beats_per_bar", 4)):
             raise ValueError("motif and form beats_per_bar must match")
+        subdivisions = [float(value) for value in motif.get("allowed_subdivisions", [])]
+        if not subdivisions or any(value <= 0 or value > motif_beats_per_bar for value in subdivisions):
+            raise ValueError("motif.allowed_subdivisions must contain positive beat values within one bar")
+        density_thresholds = motif.get("density_thresholds", {})
+        medium_above = float(density_thresholds.get("medium_above", -1))
+        fast_above = float(density_thresholds.get("fast_above", -1))
+        if not 0 <= medium_above < fast_above <= 1:
+            raise ValueError("motif density thresholds must satisfy 0 <= medium_above < fast_above <= 1")
+        valence_thresholds = motif.get("valence_thresholds", {})
+        low_below = float(valence_thresholds.get("low_below", -1))
+        high_above = float(valence_thresholds.get("high_above", -1))
+        if not 0 <= low_below < high_above <= 1:
+            raise ValueError("motif valence thresholds must satisfy 0 <= low_below < high_above <= 1")
+        allowed_contours = {"ascending", "descending", "wave"}
+        contours = motif.get("contours", {})
+        if set(contours) != {"low_valence", "neutral", "high_valence"} or any(
+            value not in allowed_contours for value in contours.values()
+        ):
+            raise ValueError("motif.contours must define valid low, neutral, and high valence contours")
+        total_beats = motif_bars * motif_beats_per_bar
+        anchors = [float(value) for value in motif.get("anchors", {}).get("beats", [])]
+        if any(value < 0 or value >= total_beats for value in anchors):
+            raise ValueError("motif anchor beats must fall within the motif")
+        allowed_transforms = {"simplify", "identity", "transpose", "invert", "compress", "recall", "cadence"}
+        transforms = motif.get("transform_by_form", {})
+        if set(transforms) != roles or any(value not in allowed_transforms for value in transforms.values()):
+            raise ValueError("motif.transform_by_form must define a valid transform for every form role")
+        transform_settings = motif.get("transform_settings", {})
+        if int(transform_settings.get("simplify_stride", 0)) < 1:
+            raise ValueError("motif simplify_stride must be at least 1")
+        if not -7 <= int(transform_settings.get("transpose_scale_steps", 0)) <= 7:
+            raise ValueError("motif transpose_scale_steps must be between -7 and 7")
+        if not 0 < float(transform_settings.get("compression_ratio", 0)) <= 1:
+            raise ValueError("motif compression_ratio must be between 0 and 1")
+        if float(transform_settings.get("cadence_duration_beats", 0)) <= 0:
+            raise ValueError("motif cadence_duration_beats must be positive")
 
-        worker_url = str(config["melody"].get("worker_url", ""))
+        melody = config["melody"]
+        worker_url = str(melody.get("worker_url", ""))
         parsed = urlparse(worker_url)
         if parsed.scheme not in {"ws", "wss"} or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}:
             raise ValueError("melody.worker_url must be a localhost WebSocket URL")
-        if float(config["melody"].get("frame_hz", 25)) != 25:
+        if float(melody.get("frame_hz", 25)) != 25:
             raise ValueError("MRT2 conditioning frame_hz must be 25")
+        prompt_template = str(melody.get("prompt_template", ""))
+        if not prompt_template.strip():
+            raise ValueError("melody.prompt_template must not be empty")
+        allowed_prompt_fields = {"mood", "energy", "articulation", "form"}
+        try:
+            prompt_fields = {
+                field_name
+                for _, field_name, _, _ in Formatter().parse(prompt_template)
+                if field_name is not None
+            }
+        except ValueError as exc:
+            raise ValueError(f"invalid melody.prompt_template: {exc}") from exc
+        unknown_prompt_fields = prompt_fields - allowed_prompt_fields
+        if "" in prompt_fields or unknown_prompt_fields:
+            invalid = sorted(unknown_prompt_fields | ({"positional field"} if "" in prompt_fields else set()))
+            raise ValueError(f"unknown melody prompt fields: {invalid}")
+        transcription = melody.get("transcription", {})
+        transcription_range = transcription.get("pitch_range", [])
+        if not isinstance(transcription_range, list) or len(transcription_range) != 2:
+            raise ValueError("melody.transcription.pitch_range must contain two MIDI notes")
+        transcription_low, transcription_high = map(int, transcription_range)
+        if not 0 <= transcription_low < transcription_high <= 127:
+            raise ValueError("melody.transcription.pitch_range must be an ascending MIDI range")
+        if int(transcription.get("stable_frames", 0)) < 1:
+            raise ValueError("melody.transcription.stable_frames must be at least 1")
+        if int(transcription.get("minimum_note_ms", 0)) < 1:
+            raise ValueError("melody.transcription.minimum_note_ms must be positive")
+        guardrails = melody.get("guardrails", {})
+        if guardrails.get("soft_grid") not in {"1/4", "1/8", "1/16"}:
+            raise ValueError("melody.guardrails.soft_grid must be 1/4, 1/8, or 1/16")
+        if float(guardrails.get("snap_tolerance_ms", -1)) < 0:
+            raise ValueError("melody.guardrails.snap_tolerance_ms must not be negative")
 
-        if int(config["harmony"].get("counterpoint", {}).get("maximum_voices", 2)) > 2:
-            raise ValueError("v1 counterpoint supports at most two voices")
+        harmony = config["harmony"]
+        if harmony.get("provider", "rule") != "rule":
+            raise ValueError("harmony.provider must be rule")
+        allowed_chords = {"I", "ii", "iii", "IV", "V", "vi", "vii°"}
+        progressions = harmony.get("progressions", {})
+        if not progressions or any(
+            not progression or any(symbol not in allowed_chords for symbol in progression)
+            for progression in progressions.values()
+        ):
+            raise ValueError("harmony progressions must contain supported Roman-numeral chords")
+        notochord = harmony.get("notochord", {})
+        if any(role not in {"harmony", "bass", "inner_voice"} for role in notochord.get("roles", [])):
+            raise ValueError("harmony.notochord.roles contains an unsupported role")
+        if float(notochord.get("timeout_seconds", 0.20)) <= 0:
+            raise ValueError("harmony.notochord.timeout_seconds must be positive")
+        counterpoint = harmony.get("counterpoint", {})
+        maximum_voices = int(counterpoint.get("maximum_voices", 2))
+        if not 1 <= maximum_voices <= 2:
+            raise ValueError("v1 counterpoint supports one or two voices")
+        if any(role not in roles for role in counterpoint.get("forms", [])):
+            raise ValueError("harmony.counterpoint.forms contains an unknown form role")
+        if float(counterpoint.get("entry_delay_beats", 0)) < 0:
+            raise ValueError("harmony.counterpoint.entry_delay_beats must not be negative")
+        if not -24 <= int(counterpoint.get("interval_semitones", 0)) <= 24:
+            raise ValueError("harmony.counterpoint.interval_semitones must be between -24 and 24")
 
         outputs = config["outputs"]
         if int(outputs.get("audio", {}).get("sample_rate", 48_000)) != 48_000:

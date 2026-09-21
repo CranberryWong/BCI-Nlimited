@@ -2,6 +2,12 @@ bars: 2
 beats_per_bar: 4
 base_pitch: 60
 allowed_subdivisions: [0.25, 0.5, 1.0]
+density_thresholds:
+  medium_above: 0.45
+  fast_above: 0.78
+valence_thresholds:
+  low_below: 0.38
+  high_above: 0.62
 contours:
   low_valence: descending
   neutral: wave
@@ -17,3 +23,8 @@ transform_by_form:
   climax: compress
   return: recall
   coda: cadence
+transform_settings:
+  simplify_stride: 2
+  transpose_scale_steps: 1
+  compression_ratio: 0.5
+  cadence_duration_beats: 2.0

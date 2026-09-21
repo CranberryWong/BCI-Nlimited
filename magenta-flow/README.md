@@ -7,22 +7,31 @@ Logic Pro。它不启动 `MRT2 - Jam.app`，也不从客户端回录音频。
 > MRT2 的文字提示不能绝对禁止原始音频出现叠音。本原型保证的是输出 MIDI
 > 始终单音：发送新音符前一定先关闭旧音符。
 
-## 1. 安装
+## 1. 安装与下载 Google 模型
 
-需要 Apple Silicon Mac、Python 3.11/3.12，以及已经下载的 MRT2 资源。当前默认目录为：
-
-```text
-/Users/chenwang/Documents/Magenta/magenta-rt-v2
-```
-
-在终端运行：
+需要 Apple Silicon Mac、Python 3.11/3.12 和 `uv`。此处的 Google 模型是
+Magenta RealTime 2（MRT2），本地推理不需要 Gemini API key。先安装依赖：
 
 ```bash
-cd /Users/chenwang/Developer/BCI/magenta-flow
+cd magenta-flow
 uv venv --python 3.12
 source .venv/bin/activate
 uv pip install -e '.[test]'
+mrt models init
+mrt models download
 ```
+
+`mrt models download` 会交互式选择模型，请选 `mrt2_small`（本项目默认值）。
+官方工具默认把资源存到 `~/Documents/Magenta/magenta-rt-v2/`。确认至少存在
+`models/mrt2_small/mrt2_small.mlxfn`、同目录的
+`mrt2_small_state.safetensors`，以及 `resources/musiccoca/` 和
+`resources/spectrostream/`。可运行 `python run.py --check` 校验资源及 MIDI 端口；
+没有 MIDI 端口时先按下一节创建 IAC Bus。如果资源保存在别处，独立运行时传入
+`--magenta-home /你的资源目录`；Dashboard 自动启动的工作进程目前使用上述默认目录。
+模型权重和生成文件不需要提交到本仓库。
+
+官方资料：[下载说明](https://github.com/magenta/magenta-realtime/blob/main/docs/models.md)、
+[模型许可](https://github.com/magenta/magenta-realtime/blob/main/MODEL.md)。
 
 ## 2. 配置 Logic Pro
 

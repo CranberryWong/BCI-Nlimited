@@ -318,7 +318,7 @@ export interface AdaptiveRuntimeStatus {
   transport: { running: boolean; bpm: number; bar: number; beat: number; phase: number };
   context: ContextFrame | null;
   intent: AdaptiveIntent | null;
-  form: { section_id: string; role: string; section_index: number; phrase_index: number; phrase_in_section: number; section_count: number; is_final: boolean };
+  form: { section_id: string; role: string; section_index: number; phrase_index: number; phrase_in_section: number; section_count: number; emotion_changes_used: number; emotion_change_budget: number; is_final: boolean; completed: boolean };
   tonal: Record<string, unknown> | null;
   motif: Record<string, unknown> | null;
   harmony: Record<string, unknown> | null;

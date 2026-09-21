@@ -96,6 +96,24 @@ class StemLoopMixer:
         return output
 
 
+def transcriber_config_from_payload(payload: Any) -> TranscriberConfig:
+    transcription = payload if isinstance(payload, dict) else {}
+    pitch_range = transcription.get("pitch_range", [48, 96])
+    if not isinstance(pitch_range, list) or len(pitch_range) != 2:
+        raise ValueError("transcription.pitch_range must contain two MIDI notes")
+    minimum_note_seconds = max(0.001, float(transcription.get("minimum_note_ms", 80)) / 1000.0)
+    config = TranscriberConfig(
+        fmin_midi=max(0, min(127, int(pitch_range[0]))),
+        fmax_midi=max(0, min(127, int(pitch_range[1]))),
+        stable_frames=max(1, int(transcription.get("stable_frames", 2))),
+        min_retrigger_seconds=minimum_note_seconds,
+        minimum_note_seconds=minimum_note_seconds,
+    )
+    if config.fmin_midi >= config.fmax_midi:
+        raise ValueError("transcription.pitch_range must be ascending")
+    return config
+
+
 class MagentaWorkerServer:
     def __init__(self, magenta_home: Path, model_name: str, output_dir: Path) -> None:
         self.magenta_home = magenta_home
@@ -139,7 +157,7 @@ class MagentaWorkerServer:
             )
             style = model.embed_style(control.prompt, use_mapper=True)
             state = None
-            transcriber_config = TranscriberConfig()
+            transcriber_config = transcriber_config_from_payload(command.get("transcription"))
             transcriber = StreamingMonophonicTranscriber(transcriber_config)
             artifacts = ArtifactWriter(self.output_dir, transcriber_config.sample_rate, channels=2)
             mixer = StemLoopMixer(transcriber_config.sample_rate)

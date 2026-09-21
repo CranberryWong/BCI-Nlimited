@@ -9,11 +9,12 @@
         </div>
       </div>
       <div class="top-actions">
-        <n-button @click="helpOpen = true">
+        <n-tag type="info" :bordered="false">Adaptive Performance</n-tag>
+        <n-button v-if="showLegacyUi" @click="helpOpen = true">
           <template #icon><n-icon><BookOpenText /></n-icon></template>
           使用说明
         </n-button>
-        <n-button @click="configOpen = true">
+        <n-button v-if="showLegacyUi" @click="configOpen = true">
           <template #icon><n-icon><SlidersHorizontal /></n-icon></template>
           Music Config
         </n-button>
@@ -42,6 +43,7 @@
       @stop-simulator="run(adaptive.stopAuxiliarySimulator)"
     />
     <MusicGeneratorPanel
+      v-if="showLegacyUi"
       :status="emotion.generator"
       :presets-testing="emotion.presetsTesting"
       :noto-testing="emotion.notoTesting"
@@ -54,25 +56,22 @@
       @update-portrait-harmony="run(() => emotion.updatePortraitHarmony($event))"
       @update-portrait-harmony-arpeggio="run(() => emotion.updatePortraitHarmonyArpeggio($event))"
     />
-    <section class="lower">
+    <section v-if="showLegacyUi" class="lower">
       <TrackList :tracks="tracks.tracks" @edit="selected = $event" @toggle="run(() => tracks.patchTrack($event))" @duplicate="run(() => tracks.duplicate($event))" @remove="run(() => tracks.remove($event))" @add="run(() => tracks.add($event))" />
       <OutputPanel :tracks="tracks.tracks" :midi="outputs.midi" @test="run(() => outputs.test($event))" />
-      <SessionRecorder />
     </section>
-    <section class="surface events">
+    <SessionRecorder />
+    <section v-if="showLegacyUi" class="surface events">
       <header class="events-header"><h3>Music Events</h3></header>
       <div class="events-scroll">
         <n-data-table :columns="eventColumns" :data="emotion.events" size="small" />
       </div>
     </section>
-    <TrackEditor :track="selected" :config="tracks.config" @close="selected = null" @save="saveTrack" @reset="resetTrack" />
-    <UsageHelpDrawer v-model:show="helpOpen" />
-    <MusicConfigDrawer v-model:show="configOpen" :config="tracks.config" @apply="applyConfig" @reset="run(tracks.resetConfig)" @loaded="loadedConfig" />
+    <TrackEditor v-if="showLegacyUi" :track="selected" :config="tracks.config" @close="selected = null" @save="saveTrack" @reset="resetTrack" />
+    <UsageHelpDrawer v-if="showLegacyUi" v-model:show="helpOpen" />
+    <MusicConfigDrawer v-if="showLegacyUi" v-model:show="configOpen" :config="tracks.config" @apply="applyConfig" @reset="run(tracks.resetConfig)" @loaded="loadedConfig" />
     <AdaptiveConfigDrawer
       v-model:show="adaptiveConfigOpen"
-      :locked="Boolean(adaptive.status?.config_locked)"
-      :modules="adaptive.modules"
-      @save="saveAdaptiveConfig"
     />
   </main>
 </template>
@@ -80,7 +79,7 @@
 <script setup lang="ts">
 import { BookOpenText, Network, SlidersHorizontal } from 'lucide-vue-next';
 import { isAxiosError } from 'axios';
-import { NButton, NDataTable, NIcon, useMessage, type DataTableColumns } from 'naive-ui';
+import { NButton, NDataTable, NIcon, NTag, useMessage, type DataTableColumns } from 'naive-ui';
 import { onMounted, ref } from 'vue';
 import type { MusicConfig, MusicEvent, TrackConfig } from '../../types';
 import { useEmotionStore } from '../../stores/emotion';
@@ -103,6 +102,7 @@ const emotion = useEmotionStore();
 const tracks = useTracksStore();
 const outputs = useOutputsStore();
 const adaptive = useAdaptiveStore();
+const showLegacyUi = import.meta.env.VITE_SHOW_LEGACY_UI === 'true';
 const message = useMessage();
 const selected = ref<TrackConfig | null>(null);
 const configOpen = ref(false);
@@ -138,11 +138,10 @@ function loadedConfig(config: MusicConfig) {
   tracks.config = config;
   tracks.tracks = config.default_tracks;
 }
-async function saveAdaptiveConfig(module: string, config: Record<string, unknown>) {
-  await run(() => adaptive.saveModule(module, config));
-}
 onMounted(async () => {
-  await Promise.all([emotion.init(), adaptive.init(), tracks.loadConfig(), outputs.loadMidi()]);
+  const initializers = [emotion.init(), adaptive.init()];
+  if (showLegacyUi) initializers.push(tracks.loadConfig(), outputs.loadMidi());
+  await Promise.all(initializers);
 });
 </script>
 

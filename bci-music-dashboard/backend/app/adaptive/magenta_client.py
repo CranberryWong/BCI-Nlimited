@@ -31,7 +31,15 @@ class MagentaWorkerClient:
         self.cwd = cwd
         self.process: asyncio.subprocess.Process | None = None
 
-    async def start(self, prompt: str, audio_enabled: bool, audio_gain: float, audio_device=None, artifact_dir: Path | None = None) -> None:
+    async def start(
+        self,
+        prompt: str,
+        audio_enabled: bool,
+        audio_gain: float,
+        audio_device=None,
+        artifact_dir: Path | None = None,
+        transcription: dict[str, Any] | None = None,
+    ) -> None:
         if self.task and not self.task.done():
             return
         self.stop_event.clear()
@@ -51,7 +59,10 @@ class MagentaWorkerClient:
             except Exception as exc:
                 self.status_detail = f"worker start failed: {exc}"
                 self.log("warning", "Magenta worker process could not start", {"error": str(exc)})
-        self.task = asyncio.create_task(self._run(prompt, audio_enabled, audio_gain, audio_device), name="magenta-worker-client")
+        self.task = asyncio.create_task(
+            self._run(prompt, audio_enabled, audio_gain, audio_device, transcription),
+            name="magenta-worker-client",
+        )
 
     async def stop(self) -> None:
         self.stop_event.set()
@@ -104,7 +115,14 @@ class MagentaWorkerClient:
             "url": self.url,
         }
 
-    async def _run(self, prompt: str, audio_enabled: bool, audio_gain: float, audio_device=None) -> None:
+    async def _run(
+        self,
+        prompt: str,
+        audio_enabled: bool,
+        audio_gain: float,
+        audio_device=None,
+        transcription: dict[str, Any] | None = None,
+    ) -> None:
         self.status_detail = "connecting"
         try:
             websocket = None
@@ -127,6 +145,7 @@ class MagentaWorkerClient:
                     "audio_enabled": audio_enabled,
                     "audio_gain": audio_gain,
                     "audio_device": audio_device,
+                    "transcription": transcription or {},
                 }))
                 self.sender_task = asyncio.create_task(self._sender(websocket), name="magenta-worker-sender")
                 async for raw in websocket:

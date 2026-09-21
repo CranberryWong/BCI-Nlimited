@@ -61,5 +61,10 @@ export const useAdaptiveStore = defineStore('adaptive', {
       this.modules[module] = response.data.config;
       await this.refresh();
     },
+    async resetModule(module: string) {
+      const response = await api.post(`/config/${module}/reset`);
+      this.modules[module] = response.data.config;
+      await this.refresh();
+    },
   },
 });

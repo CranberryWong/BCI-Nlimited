@@ -26,7 +26,8 @@ runtime.
 
 ## Model Placement
 
-Please place the emotion model at:
+The emotion classification model is separate from Google's Magenta RealTime 2
+(MRT2) music model. Place the emotion model at:
 
 ```text
 models/mlp_valence_model.pkl
@@ -36,6 +37,16 @@ The backend resolves the default relative model path from the project root. Over
 with `MODEL_PATH=models/mlp_valence_model.pkl` or an absolute path. A missing model is
 reported as `model_missing`; the backend and simulator still start, while
 `POST /api/control/start-model` returns a clear error.
+
+### Google Magenta RealTime 2
+
+For MRT2 melody generation on Apple Silicon, install the sibling `magenta-flow`
+environment and download `mrt2_small` with the official `mrt models init` and
+`mrt models download` commands. Follow the [step-by-step setup](../magenta-flow/README.md#1-安装与下载-google-模型).
+MRT2 runs locally, so no Gemini API key is needed. The Dashboard launches its
+localhost worker automatically when a performance starts. Its default resource
+directory is `~/Documents/Magenta/magenta-rt-v2/`; model weights stay outside Git.
+Windows and Docker use the motif-rule melody fallback.
 
 ## Local Development
 
@@ -186,6 +197,14 @@ An unavailable service never blocks Transport.
 Realtime WebSocket messages use the versioned envelope
 `{version,type,seq,timestamp,session_id,payload}`. YAML is the human-authored source;
 JSON is used only for HTTP, WebSocket, OSC metadata, and logs.
+
+The form always traverses `sections` in order. A section advances at its minimum
+phrase boundary only when confidence and transition urgency both reach
+`transition_confidence` and emotion-change budget remains. Otherwise it advances at
+`maximum_phrases_per_section` without consuming that budget. Completing the Coda
+publishes `performance_completed` and stops the performance. `/v1/music/section`
+sends `sequence, timestamp, section_id, role, phrase_index, phrase_in_section,
+changed, completed` in that order.
 
 Run the two-hour onsite acceptance monitor against a live native backend with:
 

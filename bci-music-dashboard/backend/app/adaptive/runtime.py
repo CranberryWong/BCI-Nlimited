@@ -212,6 +212,7 @@ class AdaptivePerformanceRuntime:
             float(audio_layer.model_gain if audio_layer else melody_config.get("audio", {}).get("gain", 0.2)),
             audio_layer.output_device if audio_layer else None,
             self.recorder.active_dir,
+            melody_config.get("transcription", {}),
         )
         self.task = asyncio.create_task(self._run(), name="adaptive-performance")
         self.phrase_task = asyncio.create_task(self._phrase_loop(), name="adaptive-phrase-loop")
@@ -330,9 +331,26 @@ class AdaptivePerformanceRuntime:
                 if self.current_intent is None:
                     continue
                 self.current_form, changed = self.form_engine.advance_phrase(self._windowed_form_intent())
+                if self.current_form.completed:
+                    self._log("info", "form", "performance form completed", {
+                        "form": self.current_form.model_dump(),
+                    })
+                    self.output.send_section(self.journal.sequence, self.current_form, False)
+                    await self._publish("performance_completed", {
+                        "form": self.current_form.model_dump(),
+                    })
+                    asyncio.create_task(
+                        self._stop_after_form_completion(),
+                        name="adaptive-performance-completion",
+                    )
+                    return
                 await self._plan_phrase(section_changed=changed)
         except asyncio.CancelledError:
             pass
+
+    async def _stop_after_form_completion(self) -> None:
+        await self.stop()
+        await self._publish("performance_stopped", {"reason": "form_completed"})
 
     async def _steering_loop(self) -> None:
         frame_seconds = 1.0 / max(1.0, float(self.configs.get("melody").get("frame_hz", 25)))
@@ -395,16 +413,22 @@ class AdaptivePerformanceRuntime:
         for note in self.current_harmony.counterpoint:
             self._schedule_note("harmony", note.pitch, note.velocity, note.beat, note.duration_beats, phrase_start, "counterpoint")
         for index, pitch in enumerate(self.current_harmony.bass_pitches):
-            self._schedule_note("bass", pitch, self.current_orchestration.role_velocity.get("bass", 64), index * self._beats_per_bar, min(2.0, self._beats_per_bar), phrase_start, "harmony_rule")
+            source = "notochord_bass" if "bass" in self.current_harmony.notochord_roles else "harmony_rule"
+            self._schedule_note("bass", pitch, self.current_orchestration.role_velocity.get("bass", 64), index * self._beats_per_bar, min(2.0, self._beats_per_bar), phrase_start, source)
+        for index, pitch in enumerate(self.current_harmony.inner_pitches):
+            self._schedule_note(
+                "harmony", pitch, max(1, self.current_orchestration.role_velocity.get("pad", 48) - 6),
+                index * self._beats_per_bar, self._beats_per_bar * 0.8, phrase_start, "notochord_inner_voice",
+            )
         if "pad" in self.current_orchestration.enabled_roles:
             pad_density = self.current_orchestration.role_density.get("pad", 0.0)
-            for index, root in enumerate(self.current_harmony.roots):
+            for index, voicing in enumerate(self.current_harmony.pad_voicings):
                 if ((index + self.current_form.phrase_index) % 10) / 10.0 <= pad_density:
-                    for interval in (0, 4, 7):
-                        pitch = 48 + ((root + interval) % 12)
+                    for pitch in voicing:
+                        source = "notochord_harmony" if "harmony" in self.current_harmony.notochord_roles else "harmony_pad"
                         self._schedule_note(
                             "pad", pitch, self.current_orchestration.role_velocity.get("pad", 48),
-                            index * self._beats_per_bar, self._beats_per_bar * 0.9, phrase_start, "harmony_pad",
+                            index * self._beats_per_bar, self._beats_per_bar * 0.9, phrase_start, source,
                         )
         if "fx" in self.current_orchestration.enabled_roles and self.current_intent:
             self._schedule_control(
@@ -498,10 +522,19 @@ class AdaptivePerformanceRuntime:
             metadata={"confidence": message.get("confidence", 0.0), "frequency": message.get("frequency")},
         )
         chord_root = None
+        chord_symbol = None
         if self.current_harmony and self.current_harmony.roots:
             chord_index = int(position.absolute_beat // self._beats_per_bar) % len(self.current_harmony.roots)
             chord_root = self.current_harmony.roots[chord_index]
-        guarded = self.melody_guard.apply(event, self.current_tonal, chord_root, self.transport.seconds_per_beat)
+            if chord_index < len(self.current_harmony.chords):
+                chord_symbol = self.current_harmony.chords[chord_index]
+        guarded = self.melody_guard.apply(
+            event,
+            self.current_tonal,
+            chord_root,
+            self.transport.seconds_per_beat,
+            chord_symbol,
+        )
         await self._dispatch(guarded)
 
     async def _dispatch(self, event: CanonicalMusicEvent) -> None:
